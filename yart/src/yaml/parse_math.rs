@@ -4,6 +4,13 @@ use crate::{
 };
 use yaml_rust::Yaml;
 
+#[inline(always)]
+pub fn parse_real(node: &Yaml) -> Option<Real> {
+    node.as_f64()
+        .or_else(|| node.as_i64().map(|x| x as f64))
+        .map(|x| x as Real)
+}
+
 pub fn parse_vector4(node: &Yaml) -> Option<Vector4> {
     if !node.is_array() {
         return None;
@@ -13,16 +20,16 @@ pub fn parse_vector4(node: &Yaml) -> Option<Vector4> {
 
     match vec.len() {
         1 => Some(Vector4::new(
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
         )),
         4 => Some(Vector4::new(
-            vec[0].as_f64()? as Real,
-            vec[1].as_f64()? as Real,
-            vec[2].as_f64()? as Real,
-            vec[3].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[1])?,
+            parse_real(&vec[2])?,
+            parse_real(&vec[3])?,
         )),
         _ => None,
     }
@@ -37,14 +44,14 @@ pub fn parse_vector3(node: &Yaml) -> Option<Vector3> {
 
     match vec.len() {
         1 => Some(Vector3::new(
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
         )),
         3 => Some(Vector3::new(
-            vec[0].as_f64()? as Real,
-            vec[1].as_f64()? as Real,
-            vec[2].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[1])?,
+            parse_real(&vec[2])?,
         )),
         _ => None,
     }
@@ -58,14 +65,8 @@ pub fn parse_vector2(node: &Yaml) -> Option<Vector2> {
     let vec = node.as_vec()?;
 
     match vec.len() {
-        1 => Some(Vector2::new(
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-        )),
-        2 => Some(Vector2::new(
-            vec[0].as_f64()? as Real,
-            vec[1].as_f64()? as Real,
-        )),
+        1 => Some(Vector2::new(parse_real(&vec[0])?, parse_real(&vec[0])?)),
+        2 => Some(Vector2::new(parse_real(&vec[0])?, parse_real(&vec[1])?)),
         _ => None,
     }
 }
@@ -93,16 +94,16 @@ pub fn parse_color4(node: &Yaml) -> Option<Color4> {
 
     match vec.len() {
         1 => Some(Color4::new(
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
         )),
         4 => Some(Color4::new(
-            vec[0].as_f64()? as Real,
-            vec[1].as_f64()? as Real,
-            vec[2].as_f64()? as Real,
-            vec[3].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[1])?,
+            parse_real(&vec[2])?,
+            parse_real(&vec[3])?,
         )),
         _ => None,
     }
@@ -117,14 +118,14 @@ pub fn parse_color3(node: &Yaml) -> Option<Color3> {
 
     match vec.len() {
         1 => Some(Color3::new(
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
-            vec[0].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
+            parse_real(&vec[0])?,
         )),
         3 => Some(Color3::new(
-            vec[0].as_f64()? as Real,
-            vec[1].as_f64()? as Real,
-            vec[2].as_f64()? as Real,
+            parse_real(&vec[0])?,
+            parse_real(&vec[1])?,
+            parse_real(&vec[2])?,
         )),
         _ => None,
     }

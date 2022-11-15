@@ -27,11 +27,7 @@ impl Light for PointLight {
         self.color
     }
 
-    fn get_direction_towards_light(
-        &self,
-        hit_position: &Vector3,
-        _hit_normal: &Vector3,
-    ) -> Vector3 {
+    fn get_direction_towards_light(&self, hit_position: &Vector3, _hit_normal: &Vector3) -> Vector3 {
         normalize!(self.position - hit_position)
     }
 
@@ -48,10 +44,10 @@ impl Light for PointLight {
         let normalized_actual_direction_to_light = normalize!(actual_direction_to_light);
 
         let ray = Ray::new(hit_position, &normalized_actual_direction_to_light);
-        let distance = scene.cast_ray_distance(&ray);
+        let maybe_distance = scene.cast_ray_distance(&ray);
 
-        match distance {
-            Some(distance_some) => distance_some >= distance_to_light - EPSILON,
+        match maybe_distance {
+            Some(distance) => distance + EPSILON <= distance_to_light,
             None => false,
         }
     }

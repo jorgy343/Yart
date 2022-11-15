@@ -1,5 +1,8 @@
 use super::parse_math::{parse_vector2u32, parse_vector3};
-use crate::cameras::{camera::Camera, perspective_camera::PerspectiveCamera};
+use crate::{
+    cameras::{camera::Camera, perspective_camera::PerspectiveCamera},
+    yaml::parse_math::parse_real,
+};
 use yaml_rust::Yaml;
 
 fn create_function_map() -> Vec<(&'static str, fn(&Yaml) -> Option<Box<dyn Camera>>)> {
@@ -27,7 +30,7 @@ fn parse_perspective_camera(node: &Yaml) -> Option<Box<dyn Camera>> {
     let look_at = parse_vector3(&node["lookAt"])?;
     let up = parse_vector3(&node["up"])?;
 
-    let field_of_view = node["fov"].as_f64()?;
+    let field_of_view = parse_real(&node["fov"])?;
     let screen_size = parse_vector2u32(&node["screenSize"])?;
     let subpixel_count = node["subpixelCount"].as_i64()? as u32;
 

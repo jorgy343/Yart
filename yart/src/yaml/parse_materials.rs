@@ -1,6 +1,5 @@
 use super::parse_math::parse_color3;
 use crate::{
-    common::Real,
     materials::{
         emissive_material::EmissiveMaterial,
         material::{Material, MaterialIndex},
@@ -9,6 +8,7 @@ use crate::{
         refractive_material::RefractiveMaterial,
     },
     math::color3::Color3,
+    yaml::parse_math::parse_real,
 };
 use std::collections::HashMap;
 use yaml_rust::Yaml;
@@ -24,9 +24,11 @@ fn create_function_map() -> Vec<(&'static str, fn(&Yaml) -> Option<Box<dyn Mater
     map
 }
 
-pub fn parse_materials(
-    node: &Yaml,
-) -> Option<(Vec<Box<dyn Material>>, HashMap<String, MaterialIndex>)> {
+fn create_default_material() -> Box<dyn Material> {
+    Box::new(EmissiveMaterial::new(&Color3::from_value(0.0)))
+}
+
+pub fn parse_materials(node: &Yaml) -> Option<(Vec<Box<dyn Material>>, HashMap<String, MaterialIndex>)> {
     let mut materials = Vec::new();
     let mut material_name_to_index_map = HashMap::new();
 
@@ -42,10 +44,6 @@ pub fn parse_materials(
     }
 
     Some((materials, material_name_to_index_map))
-}
-
-fn create_default_material() -> Box<dyn Material> {
-    Box::new(EmissiveMaterial::new(&Color3::from_value(0.0)))
 }
 
 fn parse_material(node: &Yaml) -> Option<(String, Box<dyn Material>)> {
@@ -74,7 +72,7 @@ fn parse_phong(node: &Yaml) -> Option<Box<dyn Material>> {
     let diffuse_color = parse_color3(&node["diffuseColor"])?;
     let specular_color = parse_color3(&node["specularColor"])?;
 
-    let shininess = node["shininess"].as_f64()? as Real;
+    let shininess = parse_real(&node["shininess"])?;
 
     Some(Box::new(PhongMaterial::new(
         &ambient_color,
@@ -89,7 +87,7 @@ fn parse_reflective(_node: &Yaml) -> Option<Box<dyn Material>> {
 }
 
 fn parse_refractive(node: &Yaml) -> Option<Box<dyn Material>> {
-    let refractive_index = node["refractiveIndex"].as_f64()? as Real;
+    let refractive_index = parse_real(&node["refractiveIndex"])?;
 
     Some(Box::new(RefractiveMaterial::new(refractive_index)))
 }

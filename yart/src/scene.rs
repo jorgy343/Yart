@@ -1,7 +1,7 @@
 use crate::{
     cameras::camera::Camera,
     common::{Real, NORMAL_BUMP},
-    geometries::{intersectable::Intersectable, ray::Ray},
+    geometries::{area_light::AreaLight, intersectable::Intersectable, ray::Ray},
     lights::light::Light,
     materials::material::Material,
     math::color3::Color3,
@@ -12,6 +12,7 @@ pub struct Scene {
     pub camera: Box<dyn Camera>,
     pub materials: Vec<Box<dyn Material>>,
     pub lights: Vec<Box<dyn Light>>,
+    pub area_lights: Vec<Box<dyn AreaLight>>,
     pub miss_shader: Box<dyn MissShader>,
     pub root_geometry: Box<dyn Intersectable>,
 }
@@ -21,6 +22,7 @@ impl Scene {
         camera: Box<dyn Camera>,
         materials: Vec<Box<dyn Material>>,
         lights: Vec<Box<dyn Light>>,
+        area_lights: Vec<Box<dyn AreaLight>>,
         miss_shader: Box<dyn MissShader>,
         root_geometry: Box<dyn Intersectable>,
     ) -> Self {
@@ -28,6 +30,7 @@ impl Scene {
             camera,
             materials,
             lights,
+            area_lights,
             miss_shader,
             root_geometry,
         }
@@ -47,19 +50,14 @@ impl Scene {
         match intersection {
             Some(intersection_some) => {
                 let material = if intersection_some.material_index_override > 0 {
-                    self.materials
-                        .get(intersection_some.material_index_override)
+                    self.materials.get(intersection_some.material_index_override)
                 } else {
-                    self.materials
-                        .get(intersection_some.hit_geometry.material_index())
+                    self.materials.get(intersection_some.hit_geometry.material_index())
                 };
 
-                let mut hit_position =
-                    ray.position() + intersection_some.entrance_distance * ray.direction();
+                let mut hit_position = ray.position() + intersection_some.entrance_distance * ray.direction();
 
-                let hit_normal = intersection_some
-                    .hit_geometry
-                    .calculate_normal(ray, &hit_position);
+                let hit_normal = intersection_some.hit_geometry.calculate_normal(ray, &hit_position);
 
                 hit_position += hit_normal * NORMAL_BUMP;
 

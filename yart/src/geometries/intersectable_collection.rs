@@ -18,20 +18,14 @@ impl Intersectable for IntersectableCollection {
         for geometry in &self.children {
             let intersection = geometry.intersect(ray);
 
-            closest_intersection = match closest_intersection {
-                Some(closest_intersection_some) => match intersection {
-                    Some(intersection_some) => {
-                        if intersection_some.entrance_distance
-                            < closest_intersection_some.entrance_distance
-                        {
-                            intersection
-                        } else {
-                            closest_intersection
-                        }
+            if intersection.is_some() {
+                if closest_intersection.is_some() {
+                    if intersection.unwrap().entrance_distance < closest_intersection.unwrap().entrance_distance {
+                        closest_intersection = intersection;
                     }
-                    None => closest_intersection,
-                },
-                None => closest_intersection,
+                } else {
+                    closest_intersection = intersection;
+                }
             }
         }
 

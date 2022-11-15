@@ -13,13 +13,13 @@ impl Vector2 {
     pub fn new(x: Real, y: Real) -> Self {
         Self { x, y }
     }
-
-    pub fn from_value(value: Real) -> Self {
-        Self { x: value, y: value }
-    }
 }
 
 impl Vector for Vector2 {
+    fn from_value(value: Real) -> Self {
+        Self { x: value, y: value }
+    }
+
     fn abs(value: &Self) -> Self {
         Self::new(Real::abs(value.x), Real::abs(value.y))
     }
@@ -143,9 +143,7 @@ impl_op_ex!(+|left: &Vector2, right: &Vector2| -> Vector2 {
     Vector2::new(left.x + right.x, left.y + right.y)
 });
 
-impl_op_ex!(-|left: &Vector2, right: &Vector2| -> Vector2 {
-    Vector2::new(left.x - right.x, left.y - right.y)
-});
+impl_op_ex!(-|left: &Vector2, right: &Vector2| -> Vector2 { Vector2::new(left.x - right.x, left.y - right.y) });
 
 impl_op_ex!(^|left: &Vector2, right: &Vector2| -> Real {
     Vector2::dot(left, right)
@@ -167,17 +165,11 @@ impl_op_ex_commutative!(+|left: &Vector2, right: &Real| -> Vector2 {
     Vector2::new(left.x + right, left.y + right)
 });
 
-impl_op_ex!(-|left: &Vector2, right: &Real| -> Vector2 {
-    Vector2::new(left.x - right, left.y - right)
-});
+impl_op_ex!(-|left: &Vector2, right: &Real| -> Vector2 { Vector2::new(left.x - right, left.y - right) });
 
-impl_op_ex!(-|left: &Real, right: &Vector2| -> Vector2 {
-    Vector2::new(left - right.x, left - right.y)
-});
+impl_op_ex!(-|left: &Real, right: &Vector2| -> Vector2 { Vector2::new(left - right.x, left - right.y) });
 
-impl_op_ex_commutative!(*|left: &Vector2, right: &Real| -> Vector2 {
-    Vector2::new(left.x * right, left.y * right)
-});
+impl_op_ex_commutative!(*|left: &Vector2, right: &Real| -> Vector2 { Vector2::new(left.x * right, left.y * right) });
 
 impl_op_ex!(/|left: &Vector2, right: &Real| -> Vector2 {
     Vector2::new(left.x / right, left.y / right)

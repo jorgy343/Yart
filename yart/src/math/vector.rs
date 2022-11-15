@@ -1,6 +1,12 @@
 use crate::common::*;
 
-pub trait Vector {
+pub trait Vector: Sized {
+    fn new_infinity() -> Self {
+        Self::from_value(Real::INFINITY)
+    }
+
+    fn from_value(value: Real) -> Self;
+
     fn abs(value: &Self) -> Self;
     fn abs_mut(&mut self) -> &Self;
 

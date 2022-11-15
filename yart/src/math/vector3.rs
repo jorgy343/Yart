@@ -15,10 +15,6 @@ impl Vector3 {
         Self { x, y, z }
     }
 
-    pub fn from_value(value: Real) -> Self {
-        Self::new(value, value, value)
-    }
-
     pub fn from_vector2(vector2: &Vector2, z: Real) -> Self {
         Self::new(vector2.x, vector2.y, z)
     }
@@ -31,11 +27,7 @@ impl Vector3 {
         // From: Efficient Construction of Perpendicular Vectors Without Branching.
         let a = Self::abs(value);
 
-        let xm = if a.x - a.y < 0.0 && a.x - a.z < 0.0 {
-            1u32
-        } else {
-            0u32
-        };
+        let xm = if a.x - a.y < 0.0 && a.x - a.z < 0.0 { 1u32 } else { 0u32 };
         let ym = if a.y - a.z < 0.0 { 1u32 ^ xm } else { 0u32 };
         let zm = 1u32 ^ (xm | ym);
 
@@ -51,20 +43,14 @@ impl Vector3 {
     }
 
     pub fn project_onto(&self, vector_to_project_onto: &Self) -> Self {
-        vector_to_project_onto
-            * ((self ^ vector_to_project_onto) / (vector_to_project_onto ^ vector_to_project_onto))
+        vector_to_project_onto * ((self ^ vector_to_project_onto) / (vector_to_project_onto ^ vector_to_project_onto))
     }
 
     pub fn reflect(&self, normal: &Self) -> Self {
         self - 2.0 * (self ^ normal) * normal
     }
 
-    pub fn refract(
-        incoming_direction: &Self,
-        normal: &Self,
-        from_index: Real,
-        to_index: Real,
-    ) -> Self {
+    pub fn refract(incoming_direction: &Self, normal: &Self, from_index: Real, to_index: Real) -> Self {
         let n = from_index / to_index;
         let cos = -(incoming_direction ^ normal);
 
@@ -76,12 +62,7 @@ impl Vector3 {
         }
     }
 
-    pub fn schlick_approximation(
-        incoming_direction: &Self,
-        normal: &Self,
-        from_index: Real,
-        to_index: Real,
-    ) -> Real {
+    pub fn schlick_approximation(incoming_direction: &Self, normal: &Self, from_index: Real, to_index: Real) -> Real {
         let r = (from_index / to_index) / (from_index + to_index);
         let r_2 = r * r;
 
@@ -93,6 +74,10 @@ impl Vector3 {
 }
 
 impl Vector for Vector3 {
+    fn from_value(value: Real) -> Self {
+        Self::new(value, value, value)
+    }
+
     fn abs(value: &Self) -> Self {
         Self::new(Real::abs(value.x), Real::abs(value.y), Real::abs(value.z))
     }
@@ -172,11 +157,7 @@ impl Vector for Vector3 {
 
     fn normalize(value: &Self) -> Self {
         let recip_length = value.length().recip();
-        Self::new(
-            value.x * recip_length,
-            value.y * recip_length,
-            value.z * recip_length,
-        )
+        Self::new(value.x * recip_length, value.y * recip_length, value.z * recip_length)
     }
 
     fn normalize_mut(&mut self) -> &Self {

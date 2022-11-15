@@ -16,7 +16,7 @@ use std::{error::Error, path::Path};
 use yaml::parse::load_scene;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let scene = load_scene(Path::new("../../../../scenes/rust-scene.yaml"));
+    let scene = load_scene(Path::new("../../../scenes/kitchen-sink.yaml"));
     let pixels = render(&scene);
 
     write_image_file(&pixels)?;

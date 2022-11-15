@@ -1,0 +1,18 @@
+{
+    "rust-analyzer.imports.prefix": "crate",
+    "rust-analyzer.inlayHints.reborrowHints.enable": "always",
+    "rust-analyzer.lens.references.adt.enable": true,
+    "rust-analyzer.lens.references.enumVariant.enable": true,
+    "rust-analyzer.lens.references.method.enable": true,
+    "rust-analyzer.lens.references.trait.enable": true,
+    "editor.renderWhitespace": "trailing",
+    "editor.inlayHints.padding": true,
+    "workbench.colorCustomizations": {
+        "editorInlayHint.background": "#2a2a2a",
+        "editorInlayHint.foreground": "#888"
+    },
+    "editor.rulers": [
+        120
+    ],
+    "editor.inlayHints.fontSize": 12
+}

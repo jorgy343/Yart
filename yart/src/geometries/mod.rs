@@ -1,8 +1,14 @@
+pub mod area_light;
+pub mod bound_by_box;
+pub mod bounding_box;
 pub mod geometry;
 pub mod has_material;
 pub mod intersectable;
 pub mod intersectable_collection;
 pub mod intersection;
 pub mod normal_calculator;
+pub mod parallelogram;
+pub mod plane;
 pub mod ray;
 pub mod sphere;
+pub mod triangle;

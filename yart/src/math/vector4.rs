@@ -16,10 +16,6 @@ impl Vector4 {
         Self { x, y, z, w }
     }
 
-    pub fn from_value(value: Real) -> Self {
-        Self::new(value, value, value, value)
-    }
-
     pub fn from_vector2(vector2: &Vector2, z: Real, w: Real) -> Self {
         Self::new(vector2.x, vector2.y, z, w)
     }
@@ -34,6 +30,10 @@ impl Vector4 {
 }
 
 impl Vector for Vector4 {
+    fn from_value(value: Real) -> Self {
+        Self::new(value, value, value, value)
+    }
+
     fn abs(value: &Self) -> Self {
         Self::new(
             Real::abs(value.x),
@@ -51,12 +51,7 @@ impl Vector for Vector4 {
     }
 
     fn component_mul(left: &Self, right: &Self) -> Self {
-        Self::new(
-            left.x * right.x,
-            left.y * right.y,
-            left.z * right.z,
-            left.w * right.w,
-        )
+        Self::new(left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w)
     }
 
     fn distance(left: &Self, right: &Self) -> Real {
@@ -152,12 +147,7 @@ impl Vector for Vector4 {
     }
 
     fn reciprical(value: &Self) -> Self {
-        Self::new(
-            value.x.recip(),
-            value.y.recip(),
-            value.z.recip(),
-            value.w.recip(),
-        )
+        Self::new(value.x.recip(), value.y.recip(), value.z.recip(), value.w.recip())
     }
 
     fn reciprical_mut(&mut self) -> &Self {
@@ -204,12 +194,7 @@ impl_op_ex!(+|left: &Vector4, right: &Vector4| -> Vector4 {
 });
 
 impl_op_ex!(-|left: &Vector4, right: &Vector4| -> Vector4 {
-    Vector4::new(
-        left.x - right.x,
-        left.y - right.y,
-        left.z - right.z,
-        left.w - right.w,
-    )
+    Vector4::new(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w)
 });
 
 impl_op_ex!(^|left: &Vector4, right: &Vector4| -> Real {
@@ -237,30 +222,15 @@ impl_op_ex_commutative!(+|left: &Vector4, right: &Real| -> Vector4 {
 });
 
 impl_op_ex!(-|left: &Vector4, right: &Real| -> Vector4 {
-    Vector4::new(
-        left.x - right,
-        left.y - right,
-        left.z - right,
-        left.w - right,
-    )
+    Vector4::new(left.x - right, left.y - right, left.z - right, left.w - right)
 });
 
 impl_op_ex!(-|left: &Real, right: &Vector4| -> Vector4 {
-    Vector4::new(
-        left - right.x,
-        left - right.y,
-        left - right.z,
-        left - right.w,
-    )
+    Vector4::new(left - right.x, left - right.y, left - right.z, left - right.w)
 });
 
 impl_op_ex_commutative!(*|left: &Vector4, right: &Real| -> Vector4 {
-    Vector4::new(
-        left.x * right,
-        left.y * right,
-        left.z * right,
-        left.w * right,
-    )
+    Vector4::new(left.x * right, left.y * right, left.z * right, left.w * right)
 });
 
 impl_op_ex!(/|left: &Vector4, right: &Real| -> Vector4 {

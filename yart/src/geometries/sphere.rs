@@ -58,12 +58,6 @@ impl Intersectable for Sphere {
 
         let entrance_distance = (negative_b - discriminant_sqrt) * reciprocal_a;
 
-        Some(Intersection::new(
-            self,
-            entrance_distance,
-            exit_distance,
-            0.0,
-            0,
-        ))
+        Some(Intersection::new(self, entrance_distance, exit_distance, 0.0, 0))
     }
 }
