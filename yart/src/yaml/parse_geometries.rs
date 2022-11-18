@@ -8,21 +8,21 @@ use crate::{
     },
     materials::material::MaterialIndex,
 };
-use std::collections::HashMap;
+use std::{collections::HashMap, rc::Rc};
 use yaml_rust::Yaml;
 
 enum GeometryEnum {
-    Intersectable(Box<dyn Intersectable>),
-    Geometry(Box<dyn Geometry>),
+    Intersectable(Rc<dyn Intersectable>),
+    Geometry(Rc<dyn Geometry>),
 }
 
 fn create_intersectable_function_map() -> Vec<(
     &'static str,
-    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Box<dyn AreaLight>>) -> Option<GeometryEnum>,
+    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
 )> {
     let mut map: Vec<(
         &'static str,
-        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Box<dyn AreaLight>>) -> Option<GeometryEnum>,
+        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
     )> = Vec::new();
 
     map.push(("sphere", parse_sphere));
@@ -35,11 +35,11 @@ fn create_intersectable_function_map() -> Vec<(
 
 fn create_geometry_function_map() -> Vec<(
     &'static str,
-    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Box<dyn AreaLight>>) -> Option<GeometryEnum>,
+    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
 )> {
     let mut map: Vec<(
         &'static str,
-        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Box<dyn AreaLight>>) -> Option<GeometryEnum>,
+        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
     )> = Vec::new();
 
     map.push(("sphere", parse_sphere));
@@ -52,8 +52,8 @@ fn create_geometry_function_map() -> Vec<(
 pub fn parse_intersectable(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
-) -> Option<Box<dyn Intersectable>> {
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+) -> Option<Rc<dyn Intersectable>> {
     let mut found_geometry_enum: Option<GeometryEnum> = None;
 
     for (name, function) in create_intersectable_function_map() {
@@ -67,7 +67,7 @@ pub fn parse_intersectable(
     match found_geometry_enum {
         Some(geometry_enum) => match geometry_enum {
             GeometryEnum::Intersectable(intersectable) => Some(intersectable),
-            GeometryEnum::Geometry(geometry) => Some(geometry as Box<dyn Intersectable>),
+            GeometryEnum::Geometry(geometry) => Some(geometry as Rc<dyn Intersectable>),
         },
         None => None,
     }
@@ -76,8 +76,8 @@ pub fn parse_intersectable(
 fn parse_intersectables(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
-) -> Option<Vec<Box<dyn Intersectable>>> {
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+) -> Option<Vec<Rc<dyn Intersectable>>> {
     let mut intersectables = Vec::new();
 
     if !node.is_badvalue() && node.is_array() {
@@ -96,8 +96,8 @@ fn parse_intersectables(
 fn parse_geometry(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
-) -> Option<Box<dyn Geometry>> {
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+) -> Option<Rc<dyn Geometry>> {
     let mut found_geometry_enum: Option<GeometryEnum> = None;
 
     for (name, function) in create_geometry_function_map() {
@@ -120,7 +120,7 @@ fn parse_geometry(
 fn parse_sphere(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
@@ -132,7 +132,7 @@ fn parse_sphere(
         None => 0 as MaterialIndex,
     };
 
-    Some(GeometryEnum::Geometry(Box::new(Sphere::new(
+    Some(GeometryEnum::Geometry(Rc::new(Sphere::new(
         &position,
         radius,
         material_index,
@@ -142,7 +142,7 @@ fn parse_sphere(
 fn parse_plane(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
@@ -154,7 +154,7 @@ fn parse_plane(
         None => 0 as MaterialIndex,
     };
 
-    Some(GeometryEnum::Geometry(Box::new(Plane::new(
+    Some(GeometryEnum::Geometry(Rc::new(Plane::new(
         normal,
         distance,
         material_index,
@@ -164,7 +164,7 @@ fn parse_plane(
 fn parse_triangle(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
@@ -182,7 +182,7 @@ fn parse_triangle(
     };
 
     if maybe_normal0.is_some() && maybe_normal1.is_some() && maybe_normal2.is_some() {
-        Some(GeometryEnum::Geometry(Box::new(Triangle::new(
+        Some(GeometryEnum::Geometry(Rc::new(Triangle::new(
             &vertex0,
             &vertex1,
             &vertex2,
@@ -194,7 +194,7 @@ fn parse_triangle(
     } else {
         let normal = Triangle::calculate_face_normal(&vertex0, &vertex1);
 
-        Some(GeometryEnum::Geometry(Box::new(Triangle::new(
+        Some(GeometryEnum::Geometry(Rc::new(Triangle::new(
             &vertex0,
             &vertex1,
             &vertex2,
@@ -209,7 +209,7 @@ fn parse_triangle(
 fn parse_parallelogram(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
     let area_light = node["areaLight"].as_bool().unwrap_or(false);
@@ -223,10 +223,10 @@ fn parse_parallelogram(
         None => 0 as MaterialIndex,
     };
 
-    let parallelogram = Box::new(Parallelogram::new(&position, &edge1, &edge2, material_index));
+    let parallelogram = Rc::new(Parallelogram::new(&position, &edge1, &edge2, material_index));
 
     if area_light {
-        area_lights.push(&parallelogram);
+        area_lights.push(parallelogram.clone());
     }
 
     Some(GeometryEnum::Geometry(parallelogram))
@@ -235,11 +235,11 @@ fn parse_parallelogram(
 fn parse_intersectable_collection(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Box<dyn AreaLight>>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let children = parse_intersectables(&node["children"], material_name_to_index_map, area_lights)?;
 
-    Some(GeometryEnum::Intersectable(Box::new(IntersectableCollection::new(
+    Some(GeometryEnum::Intersectable(Rc::new(IntersectableCollection::new(
         children,
     ))))
 }

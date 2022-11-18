@@ -7,14 +7,15 @@ use crate::{
     math::color3::Color3,
     miss_shaders::miss_shader::MissShader,
 };
+use std::rc::Rc;
 
 pub struct Scene {
     pub camera: Box<dyn Camera>,
     pub materials: Vec<Box<dyn Material>>,
     pub lights: Vec<Box<dyn Light>>,
-    pub area_lights: Vec<Box<dyn AreaLight>>,
+    pub area_lights: Vec<Rc<dyn AreaLight>>,
     pub miss_shader: Box<dyn MissShader>,
-    pub root_geometry: Box<dyn Intersectable>,
+    pub root_geometry: Rc<dyn Intersectable>,
 }
 
 impl Scene {
@@ -22,9 +23,9 @@ impl Scene {
         camera: Box<dyn Camera>,
         materials: Vec<Box<dyn Material>>,
         lights: Vec<Box<dyn Light>>,
-        area_lights: Vec<Box<dyn AreaLight>>,
+        area_lights: Vec<Rc<dyn AreaLight>>,
         miss_shader: Box<dyn MissShader>,
-        root_geometry: Box<dyn Intersectable>,
+        root_geometry: Rc<dyn Intersectable>,
     ) -> Self {
         Self {
             camera,
