@@ -3,7 +3,10 @@ use crate::math::{vector::Vector, vector3::Vector3};
 /// Represents an AABB (Axis Aligned Bounding Box) that encloses points or geometry.
 #[derive(Debug)]
 pub struct BoundingBox {
+    /// The minimum extent of the bounding box.
     pub minimum: Vector3,
+
+    /// The maximum extent of the bounding box.
     pub maximum: Vector3,
 }
 
@@ -153,7 +156,7 @@ impl BoundingBox {
     /// let point = Vector3::new(0.0, 9.0, -7.0);
     /// bounding_box.add_point(&point);
     ///
-    /// assert_eq! (Vector3::new(-2.0, -2.0, -7.0), bounding_box.minimum);
+    /// assert_eq!(Vector3::new(-2.0, -2.0, -7.0), bounding_box.minimum);
     /// assert_eq!(Vector3::new(3.0, 9.0, 3.0), bounding_box.maximum);
     /// ```
     pub fn add_point(&mut self, point: &Vector3) -> &mut BoundingBox {
@@ -179,7 +182,7 @@ impl BoundingBox {
     /// let other_bounding_box = BoundingBox::new(&Vector3::from_value(-7.0), &Vector3::from_value(9.0));
     /// bounding_box.add_bounding_box(&other_bounding_box);
     ///
-    /// assert_eq! (Vector3::from_value(-7.0), bounding_box.minimum);
+    /// assert_eq!(Vector3::from_value(-7.0), bounding_box.minimum);
     /// assert_eq!(Vector3::from_value(9.0), bounding_box.maximum);
     /// ```
     pub fn add_bounding_box(&mut self, other_bounding_box: &BoundingBox) -> &mut BoundingBox {
@@ -187,5 +190,124 @@ impl BoundingBox {
         self.maximum = Vector3::max(&other_bounding_box.maximum, &self.maximum);
 
         self
+    }
+
+    /// Determines if the given point is contained within the [`BoundingBox`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use yart::geometries::bounding_box::BoundingBox;
+    /// # use yart::math::{vector::Vector, vector3::Vector3};
+    /// #
+    /// let minimum = Vector3::from_value(-2.0);
+    /// let maximum = Vector3::from_value(3.0);
+    ///
+    /// let bounding_box = BoundingBox::new(&minimum, &maximum);
+    ///
+    /// let point_inside = Vector3::new(2.0, -1.0, 0.0);
+    /// let point_outside = Vector3::new(3.0, 5.0, -6.0);
+    ///
+    /// assert_eq!(true, bounding_box.contains_point(&point_inside));
+    /// assert_eq!(false, bounding_box.contains_point(&point_outside));
+    /// ```
+    pub fn contains_point(&self, point: &Vector3) -> bool {
+        point.x >= self.minimum.x
+            && point.y >= self.minimum.y
+            && point.z >= self.minimum.z
+            && point.x <= self.maximum.x
+            && point.y <= self.maximum.y
+            && point.z <= self.maximum.z
+    }
+
+    /// Determines if the given [`BoundingBox`] is contained within the [`BoundingBox`]. The other ['BoundingBox'] must
+    /// be completely inside of the [`BoundingBox`].
+    ///
+    /// The operations performed are greater than or equal to and less than or equal to. So if the edges are exactly
+    /// aligned with each other, it will still count as being contained. However, floating point errors could cause two
+    /// edges that you would think should be aligned to not be exactly aligned.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use yart::geometries::bounding_box::BoundingBox;
+    /// # use yart::math::{vector::Vector, vector3::Vector3};
+    /// #
+    /// let minimum = Vector3::from_value(-2.0);
+    /// let maximum = Vector3::from_value(3.0);
+    ///
+    /// let bounding_box = BoundingBox::new(&minimum, &maximum);
+    ///
+    /// let bounding_box_inside = BoundingBox::new(&Vector3::from_value(-1.0), &Vector3::from_value(2.0));
+    /// let bounding_box_overlapping = BoundingBox::new(&Vector3::from_value(-1.0), &Vector3::from_value(7.0));
+    /// let bounding_box_outside = BoundingBox::new(&Vector3::from_value(4.0), &Vector3::from_value(7.0));
+    ///
+    /// assert_eq!(true, bounding_box.contains_bounding_box(&bounding_box_inside));
+    /// assert_eq!(false, bounding_box.contains_bounding_box(&bounding_box_overlapping));
+    /// assert_eq!(false, bounding_box.contains_bounding_box(&bounding_box_outside));
+    /// ```
+    pub fn contains_bounding_box(&self, bounding_box: &BoundingBox) -> bool {
+        bounding_box.minimum.x >= self.minimum.x
+            && bounding_box.minimum.x <= self.maximum.x
+            && bounding_box.maximum.x >= self.minimum.x
+            && bounding_box.maximum.x <= self.maximum.x
+            && bounding_box.minimum.y >= self.minimum.y
+            && bounding_box.minimum.y <= self.maximum.y
+            && bounding_box.maximum.y >= self.minimum.y
+            && bounding_box.maximum.y <= self.maximum.y
+            && bounding_box.minimum.z >= self.minimum.z
+            && bounding_box.minimum.z <= self.maximum.z
+            && bounding_box.maximum.z >= self.minimum.z
+            && bounding_box.maximum.z <= self.maximum.z
+    }
+
+    /// Determines if the given [`BoundingBox`] intersects either fully or partially with the [`BoundingBox`]. This
+    /// method will return true if the other [`BoundingBox`] is completely contained within the [`BoundingBox`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use yart::geometries::bounding_box::BoundingBox;
+    /// # use yart::math::{vector::Vector, vector3::Vector3};
+    /// #
+    /// let minimum = Vector3::from_value(-2.0);
+    /// let maximum = Vector3::from_value(3.0);
+    ///
+    /// let bounding_box = BoundingBox::new(&minimum, &maximum);
+    ///
+    /// let bounding_box_overlapping = BoundingBox::new(&Vector3::from_value(-1.0), &Vector3::from_value(7.0));
+    /// let bounding_box_not_overlapping = BoundingBox::new(&Vector3::from_value(4.0), &Vector3::from_value(7.0));
+    ///
+    /// assert_eq!(true, bounding_box.overlaps_bounding_box(&bounding_box_overlapping));
+    /// assert_eq!(false, bounding_box.overlaps_bounding_box(&bounding_box_not_overlapping));
+    /// ```
+    pub fn overlaps_bounding_box(&self, bounding_box: &BoundingBox) -> bool {
+        bounding_box.minimum.x <= self.maximum.x
+            && bounding_box.maximum.x >= self.minimum.x
+            && bounding_box.minimum.y <= self.maximum.y
+            && bounding_box.maximum.y >= self.minimum.y
+            && bounding_box.minimum.z <= self.maximum.z
+            && bounding_box.maximum.z >= self.minimum.z
+    }
+
+    /// Calculates the point that is in the center of the [`BoundingBox`]. If any of the dimensions of the bounding box
+    /// are infinity or nan, the result is undefined but guarnateed to succeed.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use yart::geometries::bounding_box::BoundingBox;
+    /// # use yart::math::{vector::Vector, vector3::Vector3};
+    /// #
+    /// let minimum = Vector3::from_value(-2.0);
+    /// let maximum = Vector3::from_value(3.0);
+    ///
+    /// let bounding_box = BoundingBox::new(&minimum, &maximum);
+    /// let center_point = bounding_box.calculate_center_point();
+    ///
+    /// assert_eq!(Vector3::from_value(0.5), center_point);
+    /// ```
+    pub fn calculate_center_point(&self) -> Vector3 {
+        self.minimum + (self.maximum - self.minimum) * 0.5
     }
 }
