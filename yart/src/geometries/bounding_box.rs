@@ -1,4 +1,8 @@
-use crate::math::{vector::Vector, vector3::Vector3};
+use crate::{
+    common::Real,
+    geometries::ray::Ray,
+    math::{vector::Vector, vector3::Vector3},
+};
 
 /// Represents an AABB (Axis Aligned Bounding Box) that encloses points or geometry.
 #[derive(Debug)]
@@ -309,5 +313,44 @@ impl BoundingBox {
     /// ```
     pub fn calculate_center_point(&self) -> Vector3 {
         self.minimum + (self.maximum - self.minimum) * 0.5
+    }
+
+    /// Determines if a [`Ray`] intersects with the [`BoundingBox`].
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use yart::geometries::bounding_box::BoundingBox;
+    /// # use yart::math::{vector::Vector, vector3::Vector3};
+    /// # use yart::geometries::ray::Ray;
+    /// #
+    /// let minimum = Vector3::from_value(-2.0);
+    /// let maximum = Vector3::from_value(2.0);
+    ///
+    /// let bounding_box = BoundingBox::new(&minimum, &maximum);
+    ///
+    /// let ray_hits = Ray::new(&Vector3::new(0.0, 0.0, -4.0), &Vector3::new(0.0, 0.0, 1.0));
+    /// let ray_misses_facing_away = Ray::new(&Vector3::new(0.0, 0.0, -4.0), &Vector3::new(0.0, 0.0, -1.0));
+    /// let ray_misses_completely = Ray::new(&Vector3::new(0.0, 7.0, -4.0), &Vector3::new(0.0, 0.0, 1.0));
+    ///
+    /// assert_eq!(true, bounding_box.ray_intersects(&ray_hits));
+    /// assert_eq!(false, bounding_box.ray_intersects(&ray_misses_facing_away));
+    /// assert_eq!(false, bounding_box.ray_intersects(&ray_misses_completely));
+    /// ```
+    pub fn ray_intersects(&self, ray: &Ray) -> bool {
+        let min = Vector3::component_mul(&(self.minimum - ray.position()), ray.inverse_direction());
+        let max = Vector3::component_mul(&(self.maximum - ray.position()), ray.inverse_direction());
+
+        let exit_distance = Real::min(
+            Real::min(Real::max(min.x, max.x), Real::max(min.y, max.y)),
+            Real::max(min.z, max.z),
+        );
+
+        let entrance_distance = Real::max(
+            Real::max(Real::min(min.x, max.x), Real::min(min.y, max.y)),
+            Real::min(min.z, max.z),
+        );
+
+        exit_distance >= 0.0 && entrance_distance <= exit_distance
     }
 }

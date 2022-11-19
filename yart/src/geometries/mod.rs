@@ -1,6 +1,8 @@
 pub mod area_light;
 pub mod bound_by_box;
 pub mod bounding_box;
+pub mod bounding_box_hierarchy;
+pub mod bounding_box_hierarchy_leaf;
 pub mod geometry;
 pub mod has_material;
 pub mod intersectable;

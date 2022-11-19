@@ -1,6 +1,6 @@
 {
     "rust-analyzer.imports.prefix": "crate",
-    "rust-analyzer.inlayHints.reborrowHints.enable": "always",
+    "rust-analyzer.inlayHints.reborrowHints.enable": "never",
     "rust-analyzer.lens.references.adt.enable": true,
     "rust-analyzer.lens.references.enumVariant.enable": true,
     "rust-analyzer.lens.references.method.enable": true,
