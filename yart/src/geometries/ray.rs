@@ -1,6 +1,7 @@
 use crate::{
     common::Real,
     math::{vector::Vector, vector3::Vector3},
+    normalize,
 };
 
 #[derive(Debug)]
@@ -15,7 +16,7 @@ impl Ray {
         Self {
             position: *position,
             direction: *direction,
-            inverse_direction: Vector3::reciprical(direction),
+            inverse_direction: normalize!(Vector3::reciprical(direction)),
         }
     }
 

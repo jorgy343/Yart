@@ -4,6 +4,7 @@ use crate::{
     math::{color3::Color3, vector3::Vector3},
     scene::Scene,
 };
+use rand::RngCore;
 
 #[derive(Debug)]
 pub struct EmissiveMaterial {
@@ -21,6 +22,7 @@ impl EmissiveMaterial {
 impl Material for EmissiveMaterial {
     fn calculate_rendering_equation(
         &self,
+        _rng: &mut dyn RngCore,
         _scene: &Scene,
         _current_depth: u16,
         _hit_geometry: &dyn Geometry,

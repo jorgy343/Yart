@@ -6,6 +6,7 @@ use crate::{
     normalize,
     scene::Scene,
 };
+use rand::RngCore;
 
 #[derive(Debug)]
 pub struct RefractiveMaterial {
@@ -21,6 +22,7 @@ impl RefractiveMaterial {
 impl Material for RefractiveMaterial {
     fn calculate_rendering_equation(
         &self,
+        rng: &mut dyn RngCore,
         scene: &Scene,
         current_depth: u16,
         hit_geometry: &dyn Geometry,
@@ -28,8 +30,7 @@ impl Material for RefractiveMaterial {
         hit_normal: &Vector3,
         incoming_direction: &Vector3,
     ) -> Color3 {
-        let refraction_direction =
-            Vector3::refract(incoming_direction, hit_normal, 1.0, self.refraction_index);
+        let refraction_direction = Vector3::refract(incoming_direction, hit_normal, 1.0, self.refraction_index);
 
         if refraction_direction.length_squared() < EPSILON {
             return Color3::default();
@@ -58,12 +59,7 @@ impl Material for RefractiveMaterial {
 
         // Create the outgoing ray. Use the non reversed refraction direction and the reversed
         // exit normal.
-        let outgoing_direction = Vector3::refract(
-            &refraction_direction,
-            &-exit_normal,
-            self.refraction_index,
-            1.0,
-        );
+        let outgoing_direction = Vector3::refract(&refraction_direction, &-exit_normal, self.refraction_index, 1.0);
 
         if outgoing_direction.length_squared() < EPSILON {
             return Color3::default();
@@ -72,6 +68,6 @@ impl Material for RefractiveMaterial {
         let outgoing_direction = normalize!(outgoing_direction);
         let outgoing_ray = Ray::new(&exit_position, &outgoing_direction);
 
-        scene.cast_ray_color_depth(&outgoing_ray, current_depth + 1)
+        scene.cast_ray_color(rng, &outgoing_ray, current_depth + 1)
     }
 }

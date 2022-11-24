@@ -1,8 +1,8 @@
 use crate::{
     common::Real,
     geometries::{
-        has_material::HasMaterial, intersectable::Intersectable, intersection::Intersection,
-        normal_calculator::NormalCalculator, ray::Ray,
+        bound_by_box::BoundByBox, bounding_box::BoundingBox, has_material::HasMaterial, intersectable::Intersectable,
+        intersection::Intersection, normal_calculator::NormalCalculator, ray::Ray,
     },
     materials::material::MaterialIndex,
     math::vector3::Vector3,
@@ -137,5 +137,11 @@ impl Intersectable for Triangle {
         } else {
             None
         }
+    }
+}
+
+impl BoundByBox for Triangle {
+    fn calculate_bounding_box(&self) -> BoundingBox {
+        BoundingBox::from_points([self.vertex0, self.vertex1, self.vertex2].iter())
     }
 }

@@ -2,11 +2,14 @@ use super::parse_math::parse_vector3;
 use crate::{
     common::Real,
     geometries::{
-        area_light::AreaLight, geometry::Geometry, intersectable::Intersectable,
+        area_light::AreaLight, bounding_box::BoundingBox,
+        bounding_box_hierarchy::build_bounding_box_hierarchy_split_by_long_axis, bounding_geometry::BoundingGeometry,
+        bounding_volume::BoundingVolume, geometry::Geometry, intersectable::Intersectable,
         intersectable_collection::IntersectableCollection, parallelogram::Parallelogram, plane::Plane, sphere::Sphere,
         triangle::Triangle,
     },
     materials::material::MaterialIndex,
+    yaml::parse_math::parse_real,
 };
 use std::{collections::HashMap, rc::Rc};
 use yaml_rust::Yaml;
@@ -28,23 +31,10 @@ fn create_intersectable_function_map() -> Vec<(
     map.push(("sphere", parse_sphere));
     map.push(("plane", parse_plane));
     map.push(("triangle", parse_triangle));
+    map.push(("parallelogram", parse_parallelogram));
+    map.push(("boundingGeometry", parse_bounding_geometry));
     map.push(("collection", parse_intersectable_collection));
-
-    map
-}
-
-fn create_geometry_function_map() -> Vec<(
-    &'static str,
-    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
-)> {
-    let mut map: Vec<(
-        &'static str,
-        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
-    )> = Vec::new();
-
-    map.push(("sphere", parse_sphere));
-    map.push(("plane", parse_plane));
-    map.push(("triangle", parse_triangle));
+    map.push(("boundingBoxHierarchy", parse_bounding_box_hierarchy));
 
     map
 }
@@ -93,6 +83,23 @@ fn parse_intersectables(
     Some(intersectables)
 }
 
+fn create_geometry_function_map() -> Vec<(
+    &'static str,
+    fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
+)> {
+    let mut map: Vec<(
+        &'static str,
+        fn(&Yaml, &HashMap<String, MaterialIndex>, &mut Vec<Rc<dyn AreaLight>>) -> Option<GeometryEnum>,
+    )> = Vec::new();
+
+    map.push(("sphere", parse_sphere));
+    map.push(("plane", parse_plane));
+    map.push(("triangle", parse_triangle));
+    map.push(("parallelogram", parse_parallelogram));
+
+    map
+}
+
 fn parse_geometry(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
@@ -120,12 +127,12 @@ fn parse_geometry(
 fn parse_sphere(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+    _area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
     let position = parse_vector3(&node["position"])?;
-    let radius = node["radius"].as_f64()? as Real;
+    let radius = parse_real(&node["radius"])?;
 
     let material_index = match material_name_to_index_map.get(material_name) {
         Some(x) => *x,
@@ -142,29 +149,41 @@ fn parse_sphere(
 fn parse_plane(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+    _area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
     let normal = parse_vector3(&node["normal"])?;
-    let distance = node["distance"].as_f64()? as Real;
+
+    let maybe_distance = parse_real(&node["distance"]);
+    let maybe_point = parse_vector3(&node["point"]);
 
     let material_index = match material_name_to_index_map.get(material_name) {
         Some(x) => *x,
         None => 0 as MaterialIndex,
     };
 
-    Some(GeometryEnum::Geometry(Rc::new(Plane::new(
-        normal,
-        distance,
-        material_index,
-    ))))
+    if let Some(distance) = maybe_distance {
+        Some(GeometryEnum::Geometry(Rc::new(Plane::new(
+            &normal,
+            distance,
+            material_index,
+        ))))
+    } else if let Some(point) = maybe_point {
+        Some(GeometryEnum::Geometry(Rc::new(Plane::from_point(
+            &normal,
+            &point,
+            material_index,
+        ))))
+    } else {
+        None
+    }
 }
 
 fn parse_triangle(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
-    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+    _area_lights: &mut Vec<Rc<dyn AreaLight>>,
 ) -> Option<GeometryEnum> {
     let material_name = node["material"].as_str()?;
 
@@ -232,6 +251,22 @@ fn parse_parallelogram(
     Some(GeometryEnum::Geometry(parallelogram))
 }
 
+fn parse_bounding_geometry(
+    node: &Yaml,
+    material_name_to_index_map: &HashMap<String, MaterialIndex>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+) -> Option<GeometryEnum> {
+    let bounding_volume = parse_bounding_volume(&node["boundingVolume"])?;
+    let child = parse_intersectable(&node["child"], material_name_to_index_map, area_lights)?;
+
+    // TODO: Enable auto calculation of bounding box if a bounding volume is not provided.
+
+    Some(GeometryEnum::Intersectable(Rc::new(BoundingGeometry::new(
+        bounding_volume,
+        child,
+    ))))
+}
+
 fn parse_intersectable_collection(
     node: &Yaml,
     material_name_to_index_map: &HashMap<String, MaterialIndex>,
@@ -242,4 +277,43 @@ fn parse_intersectable_collection(
     Some(GeometryEnum::Intersectable(Rc::new(IntersectableCollection::new(
         children,
     ))))
+}
+
+fn parse_bounding_box_hierarchy(
+    node: &Yaml,
+    material_name_to_index_map: &HashMap<String, MaterialIndex>,
+    area_lights: &mut Vec<Rc<dyn AreaLight>>,
+) -> Option<GeometryEnum> {
+    let children = parse_intersectables(&node["children"], material_name_to_index_map, area_lights)?;
+
+    Some(GeometryEnum::Intersectable(
+        build_bounding_box_hierarchy_split_by_long_axis(children),
+    ))
+}
+
+fn create_bounding_volume_function_map() -> Vec<(&'static str, fn(&Yaml) -> Option<Rc<dyn BoundingVolume>>)> {
+    let mut map: Vec<(&'static str, fn(&Yaml) -> Option<Rc<dyn BoundingVolume>>)> = Vec::new();
+
+    map.push(("boundingBox", parse_bounding_box));
+
+    map
+}
+
+fn parse_bounding_volume(node: &Yaml) -> Option<Rc<dyn BoundingVolume>> {
+    for (name, function) in create_bounding_volume_function_map() {
+        let child_node = &node[name];
+
+        if !child_node.is_badvalue() {
+            return function(child_node);
+        }
+    }
+
+    None
+}
+
+fn parse_bounding_box(node: &Yaml) -> Option<Rc<dyn BoundingVolume>> {
+    let minimum = parse_vector3(&node["minimum"])?;
+    let maximum = parse_vector3(&node["maximum"])?;
+
+    Some(Rc::new(BoundingBox::new(&minimum, &maximum)))
 }

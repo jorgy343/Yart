@@ -7,6 +7,7 @@ use crate::{
     math::color3::Color3,
     miss_shaders::miss_shader::MissShader,
 };
+use rand::RngCore;
 use std::rc::Rc;
 
 pub struct Scene {
@@ -37,11 +38,7 @@ impl Scene {
         }
     }
 
-    pub fn cast_ray_color(&self, ray: &Ray) -> Color3 {
-        self.cast_ray_color_depth(ray, 1)
-    }
-
-    pub fn cast_ray_color_depth(&self, ray: &Ray, depth: u16) -> Color3 {
+    pub fn cast_ray_color(&self, rng: &mut dyn RngCore, ray: &Ray, depth: u16) -> Color3 {
         if depth > 7 {
             return Color3::default();
         }
@@ -64,6 +61,7 @@ impl Scene {
 
                 match material {
                     Some(material_some) => material_some.calculate_rendering_equation(
+                        rng,
                         self,
                         depth,
                         intersection_some.hit_geometry,
@@ -78,11 +76,7 @@ impl Scene {
         }
     }
 
-    pub fn cast_ray_distance(&self, ray: &Ray) -> Option<Real> {
-        self.cast_ray_distance_depth(ray, 1)
-    }
-
-    pub fn cast_ray_distance_depth(&self, ray: &Ray, _depth: u16) -> Option<Real> {
+    pub fn cast_ray_distance(&self, rng: &mut dyn RngCore, ray: &Ray) -> Option<Real> {
         let intersection = self.root_geometry.intersect(ray)?;
         Some(Real::max(0.0, intersection.entrance_distance))
     }

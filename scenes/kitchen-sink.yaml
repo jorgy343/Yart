@@ -46,34 +46,34 @@ materials:
       name: Soft White Light
       emissiveColor: [0.01]
 
-  # - lambertian:
-  #     name: White
-  #     diffuseColor: [1]
-  # - lambertian:
-  #     name: Black
-  #     diffuseColor: [0]
-  # - lambertian:
-  #     name: Red
-  #     diffuseColor: [1, 0, 0]
-  # - lambertian:
-  #     name: Green
-  #     diffuseColor: [0, 1, 0]
-  # - lambertian:
-  #     name: Blue
-  #     diffuseColor: [0, 0, 1]
-  # - lambertian:
-  #     name: Orange
-  #     diffuseColor: [1, 1, 0]
-  # - lambertian:
-  #     name: Pink
-  #     diffuseColor: [1, 0, 1]
-  # - lambertian:
-  #     name: Yellow
-  #     diffuseColor: [0, 1, 1]
+  - lambertian:
+      name: White
+      diffuseColor: [1]
+  - lambertian:
+      name: Black
+      diffuseColor: [0]
+  - lambertian:
+      name: Red
+      diffuseColor: [1, 0, 0]
+  - lambertian:
+      name: Green
+      diffuseColor: [0, 1, 0]
+  - lambertian:
+      name: Blue
+      diffuseColor: [0, 0, 1]
+  - lambertian:
+      name: Orange
+      diffuseColor: [1, 1, 0]
+  - lambertian:
+      name: Pink
+      diffuseColor: [1, 0, 1]
+  - lambertian:
+      name: Yellow
+      diffuseColor: [0, 1, 1]
 
-  # - lambertian:
-  #     name: Light Blue
-  #     diffuseColor: [0.7, 0.7, 1]
+  - lambertian:
+      name: Light Blue
+      diffuseColor: [0.7, 0.7, 1]
 
   # - ggx:
   #     name: GGX
@@ -96,13 +96,13 @@ materials:
       shininess: 25
 
 lights:
-  #- directional:
-  #    color: [1]
-  #    direction: [0, -1, 0]
+#   - directional:
+#      color: [1]
+#      direction: [0, -1, 0]
 
-  #- point:
-  #    color: [1]
-  #    position: [0, 19.9, 0]
+  - point:
+     color: [1]
+     position: [0, 19.9, 0]
 
 geometry:
   collection:
@@ -121,51 +121,51 @@ geometry:
       #    normal: [0, -1, 0]
       #    radius: 0.65
 
-      - boundingGeometry:
-          child:
-            rayMarcher:
-              children:
-                - union:
-                    smoothingAmount: 1.8
-                    left:
-                      sphere:
-                        material: Reflective
-                        position: [-7, 0, -2]
-                        radius: 2
-                    right:
-                      union:
-                        smoothingAmount: 6
-                        left:
-                          sphere:
-                            material: Reflective
-                            position: [-11, 0, -2]
-                            radius: 2
-                        right:
-                          sphere:
-                            material: Reflective
-                            position: [-4.3, 2.3, -2]
-                            radius: 0.5
+    #   - boundingGeometry:
+    #       child:
+    #         rayMarcher:
+    #           children:
+    #             - union:
+    #                 smoothingAmount: 1.8
+    #                 left:
+    #                   sphere:
+    #                     material: Reflective
+    #                     position: [-7, 0, -2]
+    #                     radius: 2
+    #                 right:
+    #                   union:
+    #                     smoothingAmount: 6
+    #                     left:
+    #                       sphere:
+    #                         material: Reflective
+    #                         position: [-11, 0, -2]
+    #                         radius: 2
+    #                     right:
+    #                       sphere:
+    #                         material: Reflective
+    #                         position: [-4.3, 2.3, -2]
+    #                         radius: 0.5
 
-      - boundingGeometry:
-          child:
-            rayMarcher:
-              children:
-                - cylinder:
-                    material: Light Blue
-                    start: [12, -1, 0]
-                    end: [13, -5, 0]
-                    radius: 3
+    #   - boundingGeometry:
+    #       child:
+    #         rayMarcher:
+    #           children:
+    #             - cylinder:
+    #                 material: Light Blue
+    #                 start: [12, -1, 0]
+    #                 end: [13, -5, 0]
+    #                 radius: 3
 
-      - boundingGeometry:
-          child:
-            triangleMeshObj:
-              material: White
-              objFile: ../../../../Yart.Engine/teapot.obj
-              transformation:
-                build:
-                  - scale: [2]
-                  - rotate: [0, 90, 0]
-                  - translate: [0, -7, -10]
+    #   - boundingGeometry:
+    #       child:
+    #         triangleMeshObj:
+    #           material: White
+    #           objFile: ../../../../Yart.Engine/teapot.obj
+    #           transformation:
+    #             build:
+    #               - scale: [2]
+    #               - rotate: [0, 90, 0]
+    #               - translate: [0, -7, -10]
 
       - triangle:
           material: White
@@ -173,27 +173,27 @@ geometry:
           vertex1: [0, 4, 10]
           vertex2: [4, 0, 10]
 
-      - disc:
-          material: Light Blue
-          position: [-14, 2, 10]
-          normal: [0, 0, 1]
-          radius: 3
+    #   - disc:
+    #       material: Light Blue
+    #       position: [-14, 2, 10]
+    #       normal: [0, 0, 1]
+    #       radius: 3
 
-      - axisAlignedBox:
-          material: GGX
-          minimum: [14, 8, 6]
-          maximum: [16, 10, 8]
+    #   - axisAlignedBox:
+    #       material: GGX
+    #       minimum: [14, 8, 6]
+    #       maximum: [16, 10, 8]
 
-      - transformed:
-          transformation:
-            build:
-              - scale: [4, 8, 2]
-              - translate: [-3, 2, 0]
-          child:
-            sphere:
-              material: Refractive
-              position: [0, 0, 0]
-              radius: 1
+    #   - transformed:
+    #       transformation:
+    #         build:
+    #           - scale: [4, 8, 2]
+    #           - translate: [-3, 2, 0]
+    #       child:
+    #         sphere:
+    #           material: Refractive
+    #           position: [0, 0, 0]
+    #           radius: 1
 
       - plane:
           material: Green
@@ -215,11 +215,10 @@ geometry:
           material: Yellow
           normal: [1, 0, 0]
           point: [-20, 0, 0]
-          
+
       - boundingGeometry:
           boundingVolume:
-            axisAlignedBox:
-              material: White
+            boundingBox:
               minimum: [-19, -19, 14]
               maximum: [19, 19, 20]
           child:
@@ -266,7 +265,7 @@ geometry:
                     material: GGX
                     position: [16, 8, 17]
                     radius: 3
-                  
+
                 - sphere:
                     material: White
                     position: [-16, 0, 17]

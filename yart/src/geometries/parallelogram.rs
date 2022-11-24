@@ -1,12 +1,13 @@
 use crate::{
     common::{Real, EPSILON},
     geometries::{
-        area_light::AreaLight, has_material::HasMaterial, intersectable::Intersectable, intersection::Intersection,
-        normal_calculator::NormalCalculator, ray::Ray,
+        area_light::AreaLight, bound_by_box::BoundByBox, bounding_box::BoundingBox, has_material::HasMaterial,
+        intersectable::Intersectable, intersection::Intersection, normal_calculator::NormalCalculator, ray::Ray,
     },
     materials::material::MaterialIndex,
     math::{vector::Vector, vector3::Vector3},
     normalize,
+    scene::Scene,
 };
 use rand::{Rng, RngCore};
 
@@ -109,7 +110,8 @@ impl AreaLight for Parallelogram {
 
     fn is_in_shadow(
         &self,
-        scene: &crate::scene::Scene,
+        rng: &mut dyn RngCore,
+        scene: &Scene,
         hit_position: &Vector3,
         _hit_normal: &Vector3,
         point_on_light: &Vector3,
@@ -120,7 +122,7 @@ impl AreaLight for Parallelogram {
         let direction_to_light = normalize!(direction_to_light);
 
         let ray = Ray::new(hit_position, &direction_to_light);
-        let maybe_distance = scene.cast_ray_distance(&ray);
+        let maybe_distance = scene.cast_ray_distance(rng, &ray);
 
         match maybe_distance {
             Some(distance) => !(distance >= distance_to_light - EPSILON),
@@ -137,5 +139,19 @@ impl AreaLight for Parallelogram {
         _outgoing_direction: &Vector3,
     ) -> Real {
         self.area
+    }
+}
+
+impl BoundByBox for Parallelogram {
+    fn calculate_bounding_box(&self) -> BoundingBox {
+        BoundingBox::from_points(
+            [
+                self.position,
+                self.position + self.edge1,
+                self.position + self.edge2,
+                self.position + self.edge1 + self.edge2,
+            ]
+            .iter(),
+        )
     }
 }

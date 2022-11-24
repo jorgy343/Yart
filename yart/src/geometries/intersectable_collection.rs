@@ -1,4 +1,7 @@
-use super::{intersectable::Intersectable, intersection::Intersection};
+use crate::geometries::{
+    bound_by_box::BoundByBox, bounding_box::BoundingBox, intersectable::Intersectable, intersection::Intersection,
+    ray::Ray,
+};
 use std::rc::Rc;
 
 #[derive(Debug)]
@@ -13,7 +16,7 @@ impl IntersectableCollection {
 }
 
 impl Intersectable for IntersectableCollection {
-    fn intersect(&self, ray: &super::ray::Ray) -> Option<Intersection> {
+    fn intersect(&self, ray: &Ray) -> Option<Intersection> {
         let mut maybe_closest_intersection: Option<Intersection> = None;
 
         for geometry in &self.children {
@@ -31,5 +34,11 @@ impl Intersectable for IntersectableCollection {
         }
 
         maybe_closest_intersection
+    }
+}
+
+impl BoundByBox for IntersectableCollection {
+    fn calculate_bounding_box(&self) -> BoundingBox {
+        BoundingBox::from_geometries(self.children.iter().map(|x| x.as_ref()))
     }
 }

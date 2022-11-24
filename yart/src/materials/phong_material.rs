@@ -5,6 +5,7 @@ use crate::{
     math::{color3::Color3, vector3::Vector3},
     scene::Scene,
 };
+use rand::RngCore;
 
 #[derive(Debug)]
 pub struct PhongMaterial {
@@ -16,12 +17,7 @@ pub struct PhongMaterial {
 }
 
 impl PhongMaterial {
-    pub fn new(
-        ambient_color: &Color3,
-        diffuse_color: &Color3,
-        specular_color: &Color3,
-        shininess: Real,
-    ) -> Self {
+    pub fn new(ambient_color: &Color3, diffuse_color: &Color3, specular_color: &Color3, shininess: Real) -> Self {
         Self {
             ambient_color: *ambient_color,
             diffuse_color: *diffuse_color,
@@ -34,6 +30,7 @@ impl PhongMaterial {
 impl Material for PhongMaterial {
     fn calculate_rendering_equation(
         &self,
+        rng: &mut dyn RngCore,
         scene: &Scene,
         _current_depth: u16,
         _hit_geometry: &dyn Geometry,
@@ -48,7 +45,7 @@ impl Material for PhongMaterial {
         for light in &scene.lights {
             let direction_to_light = light.get_direction_towards_light(hit_position, hit_normal);
 
-            if light.is_in_shadow(scene, hit_position, hit_normal, &direction_to_light) {
+            if light.is_in_shadow(rng, scene, hit_position, hit_normal, &direction_to_light) {
                 continue;
             }
 
@@ -60,9 +57,8 @@ impl Material for PhongMaterial {
                 let reflection_dot_view = reflection_direction ^ incoming_direction;
 
                 if reflection_dot_view >= 0.0 {
-                    specular_component += Real::powf(reflection_dot_view, self.shininess)
-                        * self.specular_color
-                        * light.color();
+                    specular_component +=
+                        Real::powf(reflection_dot_view, self.shininess) * self.specular_color * light.color();
                 }
             }
         }

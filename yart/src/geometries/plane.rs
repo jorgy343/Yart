@@ -1,8 +1,11 @@
-use crate::{common::Real, materials::material::MaterialIndex, math::vector3::Vector3};
-
-use super::{
-    has_material::HasMaterial, intersectable::Intersectable, intersection::Intersection,
-    normal_calculator::NormalCalculator, ray::Ray,
+use crate::{
+    common::Real,
+    geometries::{
+        bound_by_box::BoundByBox, has_material::HasMaterial, intersectable::Intersectable, intersection::Intersection,
+        normal_calculator::NormalCalculator, ray::Ray,
+    },
+    materials::material::MaterialIndex,
+    math::vector3::Vector3,
 };
 
 #[derive(Debug)]
@@ -13,10 +16,18 @@ pub struct Plane {
 }
 
 impl Plane {
-    pub fn new(normal: Vector3, distance: Real, material_index: MaterialIndex) -> Self {
+    pub fn new(normal: &Vector3, distance: Real, material_index: MaterialIndex) -> Self {
         Self {
-            normal,
+            normal: *normal,
             distance,
+            material_index,
+        }
+    }
+
+    pub fn from_point(normal: &Vector3, point: &Vector3, material_index: MaterialIndex) -> Self {
+        Self {
+            normal: *normal,
+            distance: -(normal ^ point),
             material_index,
         }
     }
@@ -58,3 +69,5 @@ impl Intersectable for Plane {
         }
     }
 }
+
+impl BoundByBox for Plane {}

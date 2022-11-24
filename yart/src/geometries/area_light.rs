@@ -1,16 +1,20 @@
 use crate::{common::Real, math::vector3::Vector3, scene::Scene};
 use rand::RngCore;
+use std::fmt::Debug;
 
-pub trait AreaLight {
+pub trait AreaLight: Debug {
     fn get_direction_towards_light(
         &self,
         rng: &mut dyn RngCore,
         hit_position: &Vector3,
         hit_normal: &Vector3,
     ) -> Vector3;
+
     fn get_point_on_light(&self, rng: &mut dyn RngCore, hit_position: &Vector3, hit_normal: &Vector3) -> Vector3;
+
     fn is_in_shadow(
         &self,
+        rng: &mut dyn RngCore,
         scene: &Scene,
         hit_position: &Vector3,
         hit_normal: &Vector3,

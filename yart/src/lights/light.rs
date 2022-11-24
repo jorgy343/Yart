@@ -2,6 +2,7 @@ use crate::{
     math::{color3::Color3, vector3::Vector3},
     scene::Scene,
 };
+use rand::RngCore;
 use std::fmt::Debug;
 
 pub trait Light: Debug {
@@ -11,6 +12,7 @@ pub trait Light: Debug {
 
     fn is_in_shadow(
         &self,
+        rng: &mut dyn RngCore,
         scene: &Scene,
         hit_position: &Vector3,
         hit_normal: &Vector3,

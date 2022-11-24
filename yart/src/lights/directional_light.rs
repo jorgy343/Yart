@@ -4,6 +4,7 @@ use crate::{
     math::{color3::Color3, vector3::Vector3},
     scene::Scene,
 };
+use rand::RngCore;
 
 #[derive(Debug)]
 pub struct DirectionalLight {
@@ -35,23 +36,20 @@ impl Light for DirectionalLight {
         self.color
     }
 
-    fn get_direction_towards_light(
-        &self,
-        _hit_position: &Vector3,
-        _hit_normal: &Vector3,
-    ) -> Vector3 {
+    fn get_direction_towards_light(&self, _hit_position: &Vector3, _hit_normal: &Vector3) -> Vector3 {
         self.reversed_direction
     }
 
     fn is_in_shadow(
         &self,
+        rng: &mut dyn RngCore,
         scene: &Scene,
         hit_position: &Vector3,
         _hit_normal: &Vector3,
         _direction_to_light: &Vector3,
     ) -> bool {
         let ray = Ray::new(hit_position, &self.reversed_direction);
-        let distance = scene.cast_ray_distance(&ray);
+        let distance = scene.cast_ray_distance(rng, &ray);
 
         match distance {
             Some(_) => true,

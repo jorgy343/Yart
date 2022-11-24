@@ -2,6 +2,7 @@ use super::parse_math::parse_color3;
 use crate::{
     materials::{
         emissive_material::EmissiveMaterial,
+        lambertian_material::LambertianMaterial,
         material::{Material, MaterialIndex},
         phong_material::PhongMaterial,
         reflective_material::ReflectiveMaterial,
@@ -20,6 +21,7 @@ fn create_function_map() -> Vec<(&'static str, fn(&Yaml) -> Option<Box<dyn Mater
     map.push(("phong", parse_phong));
     map.push(("reflective", parse_reflective));
     map.push(("refractive", parse_refractive));
+    map.push(("lambertian", parse_lambertian));
 
     map
 }
@@ -90,4 +92,10 @@ fn parse_refractive(node: &Yaml) -> Option<Box<dyn Material>> {
     let refractive_index = parse_real(&node["refractiveIndex"])?;
 
     Some(Box::new(RefractiveMaterial::new(refractive_index)))
+}
+
+fn parse_lambertian(node: &Yaml) -> Option<Box<dyn Material>> {
+    let diffuse_color = parse_color3(&node["diffuseColor"])?;
+
+    Some(Box::new(LambertianMaterial::new(&diffuse_color)))
 }

@@ -2,7 +2,13 @@ use super::{
     has_material::HasMaterial, intersectable::Intersectable, intersection::Intersection,
     normal_calculator::NormalCalculator, ray::Ray,
 };
-use crate::{common::Real, materials::material::MaterialIndex, math::vector3::Vector3, normalize};
+use crate::{
+    common::Real,
+    geometries::{bound_by_box::BoundByBox, bounding_box::BoundingBox},
+    materials::material::MaterialIndex,
+    math::vector3::Vector3,
+    normalize,
+};
 
 #[derive(Debug)]
 pub struct Sphere {
@@ -59,5 +65,11 @@ impl Intersectable for Sphere {
         let entrance_distance = (negative_b - discriminant_sqrt) * reciprocal_a;
 
         Some(Intersection::new(self, entrance_distance, exit_distance, 0.0, 0))
+    }
+}
+
+impl BoundByBox for Sphere {
+    fn calculate_bounding_box(&self) -> BoundingBox {
+        BoundingBox::new(&(self.position - self.radius), &(self.position + self.radius))
     }
 }
