@@ -34,10 +34,10 @@ impl BoundByBox for BoundingBoxLeaf {
 }
 
 fn build_bounding_box_hierarchy_split_by_long_axis_internal(
-    current_depth: u16,
+    _current_depth: u16,
     geometries: Vec<Rc<dyn Intersectable>>,
 ) -> Rc<dyn Intersectable> {
-    const maximum_leafs: usize = 8;
+    const MAXIMUM_LEAFS: usize = 8;
 
     let complete_bounding_box = BoundingBox::from_geometries(geometries.iter().map(|x| x.as_ref()));
 
@@ -52,7 +52,7 @@ fn build_bounding_box_hierarchy_split_by_long_axis_internal(
     };
 
     // Sort the geometries by the longest axis and chunk them together.
-    let geometries_per_level = usize::max(1, f64::ceil(geometries.len() as f64 / maximum_leafs as f64) as usize);
+    let geometries_per_level = usize::max(1, f64::ceil(geometries.len() as f64 / MAXIMUM_LEAFS as f64) as usize);
 
     let geometry_chunks = geometries
         .iter()

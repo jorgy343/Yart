@@ -17,8 +17,7 @@ use yaml::parse::load_scene;
 
 fn main() -> Result<(), Box<dyn Error>> {
     let scene = load_scene(Path::new("../../../scenes/kitchen-sink.yaml"));
-    println!("{:?}", scene.root_geometry);
-    //println!("{:?}", scene.lights);
+    //println!("{:?}", scene.root_geometry);
 
     let pixels = render(&scene);
 
@@ -33,7 +32,7 @@ fn render(scene: &Scene) -> Vec<Rgb<u8>> {
 
     for y in 0..1080 {
         for x in 0..1920 {
-            let ray = scene.camera.create_ray((x, y), (0, 0));
+            let ray = scene.camera.create_ray(&mut rng, (x, y), (0, 0));
             let color = scene.cast_ray_color(&mut rng, &ray, 1);
 
             let pixel = Rgb::from([

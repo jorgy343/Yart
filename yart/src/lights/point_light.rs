@@ -34,7 +34,7 @@ impl Light for PointLight {
 
     fn is_in_shadow(
         &self,
-        rng: &mut dyn RngCore,
+        _rng: &mut dyn RngCore,
         scene: &Scene,
         hit_position: &Vector3,
         _hit_normal: &Vector3,
@@ -46,7 +46,7 @@ impl Light for PointLight {
         let normalized_actual_direction_to_light = normalize!(actual_direction_to_light);
 
         let ray = Ray::new(hit_position, &normalized_actual_direction_to_light);
-        let maybe_distance = scene.cast_ray_distance(rng, &ray);
+        let maybe_distance = scene.cast_ray_distance(&ray);
 
         match maybe_distance {
             Some(distance) => distance + EPSILON <= distance_to_light,

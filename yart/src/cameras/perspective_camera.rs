@@ -1,5 +1,6 @@
 use super::camera::Camera;
 use crate::{common::Real, geometries::ray::Ray, math::vector3::Vector3, normalize};
+use rand::{Rng, RngCore};
 
 pub struct PerspectiveCamera {
     reciprical_width: Real,
@@ -49,8 +50,8 @@ impl PerspectiveCamera {
         let reciprical_width = Real::recip(screen_size.0 as Real);
         let reciprical_height = Real::recip(screen_size.1 as Real);
 
-        let subpixel_size_x = Real::recip((subpixel_count as Real) * reciprical_width);
-        let subpixel_size_y = Real::recip((subpixel_count as Real) * reciprical_height);
+        let subpixel_size_x = Real::recip(subpixel_count as Real) * reciprical_width;
+        let subpixel_size_y = Real::recip(subpixel_count as Real) * reciprical_height;
 
         Self {
             reciprical_width,
@@ -70,23 +71,18 @@ impl PerspectiveCamera {
 }
 
 impl Camera for PerspectiveCamera {
-    fn create_ray(&self, pixel: (u32, u32), subpixel: (u32, u32)) -> Ray {
-        let mut normalized_x =
-            ((self.screen_size.0 as Real) - (pixel.0 as Real) - 1.0) * self.reciprical_width;
-
+    fn create_ray(&self, rng: &mut dyn RngCore, pixel: (u32, u32), subpixel: (u32, u32)) -> Ray {
+        let mut normalized_x = ((self.screen_size.0 as Real) - (pixel.0 as Real) - 1.0) * self.reciprical_width;
         let mut normalized_y = (pixel.1 as Real) * self.reciprical_height;
 
         normalized_x += (subpixel.0 as Real) * self.subpixel_size_x;
         normalized_y += (subpixel.1 as Real) * self.subpixel_size_y;
 
-        normalized_x += 0.0 * self.subpixel_size_x;
-        normalized_y += 0.0 * self.subpixel_size_y;
+        normalized_x += rng.gen::<Real>() * self.subpixel_size_x;
+        normalized_y += rng.gen::<Real>() * self.subpixel_size_y;
 
-        let ray_direction = normalize!(
-            self.upper_left_corner + (normalized_x * self.du)
-                - (normalized_y * self.dv)
-                - self.position
-        );
+        let ray_direction =
+            normalize!(self.upper_left_corner + (normalized_x * self.du) - (normalized_y * self.dv) - self.position);
 
         Ray::new(&self.position, &ray_direction)
     }

@@ -110,7 +110,7 @@ impl AreaLight for Parallelogram {
 
     fn is_in_shadow(
         &self,
-        rng: &mut dyn RngCore,
+        _rng: &mut dyn RngCore,
         scene: &Scene,
         hit_position: &Vector3,
         _hit_normal: &Vector3,
@@ -122,7 +122,7 @@ impl AreaLight for Parallelogram {
         let direction_to_light = normalize!(direction_to_light);
 
         let ray = Ray::new(hit_position, &direction_to_light);
-        let maybe_distance = scene.cast_ray_distance(rng, &ray);
+        let maybe_distance = scene.cast_ray_distance(&ray);
 
         match maybe_distance {
             Some(distance) => !(distance >= distance_to_light - EPSILON),

@@ -1,6 +1,5 @@
 use super::parse_math::parse_vector3;
 use crate::{
-    common::Real,
     geometries::{
         area_light::AreaLight, bounding_box::BoundingBox,
         bounding_box_hierarchy::build_bounding_box_hierarchy_split_by_long_axis, bounding_geometry::BoundingGeometry,

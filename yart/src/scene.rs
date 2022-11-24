@@ -76,7 +76,7 @@ impl Scene {
         }
     }
 
-    pub fn cast_ray_distance(&self, rng: &mut dyn RngCore, ray: &Ray) -> Option<Real> {
+    pub fn cast_ray_distance(&self, ray: &Ray) -> Option<Real> {
         let intersection = self.root_geometry.intersect(ray)?;
         Some(Real::max(0.0, intersection.entrance_distance))
     }
