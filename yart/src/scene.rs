@@ -6,11 +6,13 @@ use crate::{
     materials::material::Material,
     math::color3::Color3,
     miss_shaders::miss_shader::MissShader,
+    yaml::parse_config::Config,
 };
 use rand::RngCore;
 use std::rc::Rc;
 
 pub struct Scene {
+    pub config: Config,
     pub camera: Box<dyn Camera>,
     pub materials: Vec<Box<dyn Material>>,
     pub lights: Vec<Box<dyn Light>>,
@@ -21,6 +23,7 @@ pub struct Scene {
 
 impl Scene {
     pub fn new(
+        config: Config,
         camera: Box<dyn Camera>,
         materials: Vec<Box<dyn Material>>,
         lights: Vec<Box<dyn Light>>,
@@ -29,6 +32,7 @@ impl Scene {
         root_geometry: Rc<dyn Intersectable>,
     ) -> Self {
         Self {
+            config,
             camera,
             materials,
             lights,
@@ -43,19 +47,18 @@ impl Scene {
             return Color3::default();
         }
 
-        let intersection = self.root_geometry.intersect(ray);
+        let maybe_intersection = self.root_geometry.intersect(ray);
 
-        match intersection {
-            Some(intersection_some) => {
-                let material = if intersection_some.material_index_override > 0 {
-                    self.materials.get(intersection_some.material_index_override)
+        match maybe_intersection {
+            Some(intersection) => {
+                let material = if intersection.material_index_override > 0 {
+                    self.materials.get(intersection.material_index_override)
                 } else {
-                    self.materials.get(intersection_some.hit_geometry.material_index())
+                    self.materials.get(intersection.hit_geometry.material_index())
                 };
 
-                let mut hit_position = ray.position() + intersection_some.entrance_distance * ray.direction();
-
-                let hit_normal = intersection_some.hit_geometry.calculate_normal(ray, &hit_position);
+                let mut hit_position = ray.position_along(intersection.entrance_distance);
+                let hit_normal = intersection.hit_geometry.calculate_normal(ray, &hit_position);
 
                 hit_position += hit_normal * NORMAL_BUMP;
 
@@ -64,7 +67,7 @@ impl Scene {
                         rng,
                         self,
                         depth,
-                        intersection_some.hit_geometry,
+                        intersection.hit_geometry,
                         &hit_position,
                         &hit_normal,
                         ray.direction(),

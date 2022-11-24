@@ -5,6 +5,16 @@ use crate::{
 use yaml_rust::Yaml;
 
 #[inline(always)]
+pub fn parse_u16(node: &Yaml) -> Option<u16> {
+    node.as_i64().map(|x| x as u16)
+}
+
+#[inline(always)]
+pub fn parse_u32(node: &Yaml) -> Option<u32> {
+    node.as_i64().map(|x| x as u32)
+}
+
+#[inline(always)]
 pub fn parse_real(node: &Yaml) -> Option<Real> {
     node.as_f64()
         .or_else(|| node.as_i64().map(|x| x as f64))

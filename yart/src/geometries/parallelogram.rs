@@ -120,13 +120,12 @@ impl AreaLight for Parallelogram {
         let distance_to_light = direction_to_light.length();
 
         let direction_to_light = normalize!(direction_to_light);
-
         let ray = Ray::new(hit_position, &direction_to_light);
-        let maybe_distance = scene.cast_ray_distance(&ray);
 
-        match maybe_distance {
-            Some(distance) => !(distance >= distance_to_light - EPSILON),
-            None => false,
+        if let Some(distance) = scene.cast_ray_distance(&ray) {
+            !(distance >= distance_to_light - EPSILON)
+        } else {
+            false
         }
     }
 

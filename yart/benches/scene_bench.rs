@@ -13,7 +13,7 @@ fn scene_bench(bench: &mut Bencher) {
 
     let mut rng = rand::thread_rng();
 
-    let scene = load_scene(Path::new("../../scenes/rust-scene.yaml"));
+    let scene = load_scene(Path::new("../../scenes/rust-scene.yaml")).unwrap();
 
     bench.iter(|| {
         let mut color = Color3::default();

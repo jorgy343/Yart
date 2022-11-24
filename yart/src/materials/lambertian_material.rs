@@ -31,10 +31,9 @@ impl Material for LambertianMaterial {
         hit_normal: &Vector3,
         incoming_direction: &Vector3,
     ) -> Color3 {
-        let where_to_shoot_ray = rng.gen::<Real>();
         let probability_factor = if scene.area_lights.len() == 0 { 1.0 } else { 2.0 };
 
-        if scene.area_lights.len() == 0 || where_to_shoot_ray > 0.5 {
+        if scene.area_lights.len() == 0 || rng.gen::<bool>() {
             // Indirect light sample according to material.
             let outgoing_direction = generate_cosine_weighted_hemisphere_sample(rng, hit_normal);
             let outgoing_ray = Ray::new(hit_position, &outgoing_direction);

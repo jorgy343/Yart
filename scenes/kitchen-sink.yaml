@@ -1,5 +1,5 @@
 config:
-  iterations: 8
+  iterations: 1
   colorClamp: [0, 1]
 
 camera:
@@ -9,7 +9,7 @@ camera:
     up: [0, 1, 0]
     fov: 45
     screenSize: [1920, 1080]
-    subpixelCount: 4
+    subpixelCount: 2
 
   #orthographic:
   #  position: [0, 0, -39]
@@ -91,7 +91,7 @@ materials:
   - phong:
       name: Phong
       ambientColor: [0.1]
-      diffuseColor: [0, 0, 0.5]
+      diffuseColor: [0, 0.5, 0]
       specularColor: [0.6]
       shininess: 25
 
@@ -196,23 +196,23 @@ geometry:
     #           radius: 1
 
       - plane:
-          material: Green
+          material: Blue
           normal: [0, 0, 1]
           point: [0, 0, -40]
       - plane:
-          material: Blue
+          material: Red
           normal: [0, -1, 0]
           point: [0, 20, 0]
       - plane:
-          material: Orange
+          material: Blue
           normal: [0, 1, 0]
           point: [0, -20, 0]
       - plane:
-          material: Pink
+          material: Blue
           normal: [-1, 0, 0]
           point: [20, 0, 0]
       - plane:
-          material: Yellow
+          material: Blue
           normal: [1, 0, 0]
           point: [-20, 0, 0]
 

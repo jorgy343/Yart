@@ -19,6 +19,7 @@ pub struct PerspectiveCamera {
     pub up: Vector3,
 
     pub screen_size: (u32, u32),
+    pub subpixel_count: u32,
     pub field_of_view: Real,
 }
 
@@ -65,12 +66,21 @@ impl PerspectiveCamera {
             look_at: *look_at,
             up: *up,
             screen_size,
+            subpixel_count,
             field_of_view,
         }
     }
 }
 
 impl Camera for PerspectiveCamera {
+    fn screen_size(&self) -> (u32, u32) {
+        self.screen_size
+    }
+
+    fn subpixel_count(&self) -> u32 {
+        self.subpixel_count
+    }
+
     fn create_ray(&self, rng: &mut dyn RngCore, pixel: (u32, u32), subpixel: (u32, u32)) -> Ray {
         let mut normalized_x = ((self.screen_size.0 as Real) - (pixel.0 as Real) - 1.0) * self.reciprical_width;
         let mut normalized_y = (pixel.1 as Real) * self.reciprical_height;
