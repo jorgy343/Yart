@@ -35,3 +35,10 @@ pub trait Vector: Sized {
     fn reciprical(value: &Self) -> Self;
     fn reciprical_mut(&mut self) -> &Self;
 }
+
+#[macro_export]
+macro_rules! normalize {
+    ($expr:expr) => {
+        $crate::math::vector::Vector::normalize(&($expr))
+    };
+}

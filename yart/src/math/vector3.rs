@@ -1,5 +1,6 @@
 use super::{color3::Color3, vector::Vector, vector2::Vector2};
 use crate::common::*;
+use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use impl_ops::*;
 use std::ops::{self, Index, IndexMut};
 
@@ -34,6 +35,22 @@ impl Vector3 {
         value % Self::new(xm as Real, ym as Real, zm as Real)
     }
 
+    /// Performs the cross product between two vectors.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let left = Vector3::new(2.0, 3.0, 4.0);
+    /// let right = Vector3::new(5.0, 6.0, 7.0);
+    ///
+    /// let cross_product = Vector3::cross(&left, &right);
+    ///
+    /// relative_eq!(Vector3::new(-3.0, 6.0, -3.0), &cross_product, max_relative = EPSILON);
+    /// ```
     pub fn cross(left: &Self, right: &Self) -> Self {
         Self::new(
             left.y * right.z - left.z * right.y,
@@ -46,6 +63,31 @@ impl Vector3 {
         vector_to_project_onto * ((self ^ vector_to_project_onto) / (vector_to_project_onto ^ vector_to_project_onto))
     }
 
+    /// Returns a new vector that is an outgoing reflection of itself around the normal.
+    ///
+    /// ```text
+    /// ^    ^    ^
+    ///  \   |   /
+    ///   \  |  /
+    ///    \ | /
+    ///    s n r
+    /// s = self
+    /// n = normal
+    /// r = reflected (result)
+    /// ```
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let target = Vector3::new(-0.707, 0.707, 0.0);
+    /// let normal = Vector3::new(0.0, 1.0, 0.0);
+    ///
+    /// relative_eq!(Vector3::new(0.707, 0.707, 0.0), target.reflect(&normal), epsilon = EPSILON);
+    /// ```
     pub fn reflect(&self, normal: &Self) -> Self {
         self - 2.0 * (self ^ normal) * normal
     }
@@ -286,3 +328,41 @@ impl_op_ex!(/=|left: &mut Vector3, right: &Real| {
     left.y /= right;
     left.z /= right;
 });
+
+impl AbsDiffEq for Vector3 {
+    type Epsilon = Real;
+
+    fn default_epsilon() -> Real {
+        Real::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: Real) -> bool {
+        Real::abs_diff_eq(&self.x, &other.x, epsilon)
+            && Real::abs_diff_eq(&self.y, &other.y, epsilon)
+            && Real::abs_diff_eq(&self.z, &other.z, epsilon)
+    }
+}
+
+impl RelativeEq for Vector3 {
+    fn default_max_relative() -> Real {
+        Real::default_max_relative()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Real, max_relative: Real) -> bool {
+        Real::relative_eq(&self.x, &other.x, epsilon, max_relative)
+            && Real::relative_eq(&self.y, &other.y, epsilon, max_relative)
+            && Real::relative_eq(&self.z, &other.z, epsilon, max_relative)
+    }
+}
+
+impl UlpsEq for Vector3 {
+    fn default_max_ulps() -> u32 {
+        Real::default_max_ulps()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Real, max_ulps: u32) -> bool {
+        Real::ulps_eq(&self.x, &other.x, epsilon, max_ulps)
+            && Real::ulps_eq(&self.y, &other.y, epsilon, max_ulps)
+            && Real::ulps_eq(&self.z, &other.z, epsilon, max_ulps)
+    }
+}

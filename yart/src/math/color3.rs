@@ -1,5 +1,6 @@
 use super::{color::Color, vector3::Vector3};
 use crate::common::*;
+use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use impl_ops::*;
 use std::ops::{self, Index, IndexMut};
 
@@ -165,13 +166,9 @@ impl_op_ex_commutative!(+|left: &Color3, right: &Real| -> Color3 {
     Color3::new(left.r + right, left.g + right, left.b + right)
 });
 
-impl_op_ex!(-|left: &Color3, right: &Real| -> Color3 {
-    Color3::new(left.r - right, left.g - right, left.b - right)
-});
+impl_op_ex!(-|left: &Color3, right: &Real| -> Color3 { Color3::new(left.r - right, left.g - right, left.b - right) });
 
-impl_op_ex!(-|left: &Real, right: &Color3| -> Color3 {
-    Color3::new(left - right.r, left - right.g, left - right.b)
-});
+impl_op_ex!(-|left: &Real, right: &Color3| -> Color3 { Color3::new(left - right.r, left - right.g, left - right.b) });
 
 impl_op_ex_commutative!(*|left: &Color3, right: &Real| -> Color3 {
     Color3::new(left.r * right, left.g * right, left.b * right)
@@ -209,3 +206,41 @@ impl_op_ex!(/=|left: &mut Color3, right: &Real| {
     left.g /= right;
     left.b /= right;
 });
+
+impl AbsDiffEq for Color3 {
+    type Epsilon = Real;
+
+    fn default_epsilon() -> Real {
+        Real::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: Real) -> bool {
+        Real::abs_diff_eq(&self.r, &other.r, epsilon)
+            && Real::abs_diff_eq(&self.g, &other.g, epsilon)
+            && Real::abs_diff_eq(&self.b, &other.b, epsilon)
+    }
+}
+
+impl RelativeEq for Color3 {
+    fn default_max_relative() -> Real {
+        Real::default_max_relative()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Real, max_relative: Real) -> bool {
+        Real::relative_eq(&self.r, &other.r, epsilon, max_relative)
+            && Real::relative_eq(&self.g, &other.g, epsilon, max_relative)
+            && Real::relative_eq(&self.b, &other.b, epsilon, max_relative)
+    }
+}
+
+impl UlpsEq for Color3 {
+    fn default_max_ulps() -> u32 {
+        Real::default_max_ulps()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Real, max_ulps: u32) -> bool {
+        Real::ulps_eq(&self.r, &other.r, epsilon, max_ulps)
+            && Real::ulps_eq(&self.g, &other.g, epsilon, max_ulps)
+            && Real::ulps_eq(&self.b, &other.b, epsilon, max_ulps)
+    }
+}

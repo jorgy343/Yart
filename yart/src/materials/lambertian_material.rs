@@ -31,18 +31,7 @@ impl Material for LambertianMaterial {
         hit_normal: &Vector3,
         incoming_direction: &Vector3,
     ) -> Color3 {
-        let probability_factor = if scene.area_lights.len() == 0 { 1.0 } else { 2.0 };
-
-        if scene.area_lights.len() == 0 || rng.gen::<bool>() {
-            // Indirect light sample according to material.
-            let outgoing_direction = generate_cosine_weighted_hemisphere_sample(rng, hit_normal);
-            let outgoing_ray = Ray::new(hit_position, &outgoing_direction);
-
-            let color_sample = scene.cast_ray_color(rng, &outgoing_ray, current_depth + 1);
-            let output_color = self.diffuse_color * color_sample * probability_factor;
-
-            output_color
-        } else {
+        {
             let area_light = scene.area_lights.choose(rng).unwrap();
 
             // Direct light sample to a random light.
@@ -62,8 +51,7 @@ impl Material for LambertianMaterial {
 
             let cosine_theta = Real::max(0.0, hit_normal ^ outgoing_direction);
 
-            let output_color =
-                brdf * self.diffuse_color * color_sample * inverse_pdf * cosine_theta * probability_factor;
+            let output_color = brdf * self.diffuse_color * color_sample * inverse_pdf * cosine_theta;
 
             output_color
         }

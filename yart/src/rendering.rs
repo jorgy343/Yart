@@ -1,6 +1,5 @@
-use image::Rgb;
-
 use crate::{common::Real, math::color3::Color3, scene::Scene};
+use image::Rgb;
 
 pub fn render(scene: &Scene) -> Vec<Rgb<u8>> {
     let mut rng = rand::thread_rng();

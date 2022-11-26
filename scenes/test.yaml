@@ -18,7 +18,7 @@ missShader:
 materials:
   - emissive:
       name: White Light
-      emissiveColor: [1]
+      emissiveColor: [5]
 
   - lambertian:
       name: White
@@ -61,27 +61,27 @@ geometry:
           edge2: [0, 0, 1.4]
 
       - plane:
-          material: White
+          material: Blue
           normal: [0, 0, 1]
           point: [0, 0, -40]
       - plane:
-          material: White
+          material: Red
           normal: [0, -1, 0]
           point: [0, 20, 0]
       - plane:
-          material: White
+          material: Blue
           normal: [0, 1, 0]
           point: [0, -20, 0]
       - plane:
-          material: White
+          material: Blue
           normal: [-1, 0, 0]
           point: [20, 0, 0]
       - plane:
-          material: White
+          material: Blue
           normal: [1, 0, 0]
           point: [-20, 0, 0]
 
       - sphere:
-          material: Blue
+          material: White
           position: [0, 0, 10]
-          radius: 3
+          radius: 1

@@ -1,5 +1,6 @@
 use super::{color::Color, vector4::Vector4};
 use crate::common::*;
+use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use impl_ops::*;
 use std::ops::{self, Index, IndexMut};
 
@@ -93,12 +94,7 @@ impl Color for Color4 {
     }
 
     fn reciprical(value: &Self) -> Self {
-        Self::new(
-            value.r.recip(),
-            value.g.recip(),
-            value.b.recip(),
-            value.a.recip(),
-        )
+        Self::new(value.r.recip(), value.g.recip(), value.b.recip(), value.a.recip())
     }
 
     fn reciprical_mut(&mut self) -> &Self {
@@ -145,21 +141,11 @@ impl_op_ex!(+|left: &Color4, right: &Color4| -> Color4 {
 });
 
 impl_op_ex!(-|left: &Color4, right: &Color4| -> Color4 {
-    Color4::new(
-        left.r - right.r,
-        left.g - right.g,
-        left.b - right.b,
-        left.a - right.a,
-    )
+    Color4::new(left.r - right.r, left.g - right.g, left.b - right.b, left.a - right.a)
 });
 
 impl_op_ex!(*|left: &Color4, right: &Color4| -> Color4 {
-    Color4::new(
-        left.r * right.r,
-        left.g * right.g,
-        left.b * right.b,
-        left.a * right.a,
-    )
+    Color4::new(left.r * right.r, left.g * right.g, left.b * right.b, left.a * right.a)
 });
 
 impl_op_ex!(/|left: &Color4, right: &Color4| -> Color4 {
@@ -206,30 +192,15 @@ impl_op_ex_commutative!(+|left: &Color4, right: &Real| -> Color4 {
 });
 
 impl_op_ex!(-|left: &Color4, right: &Real| -> Color4 {
-    Color4::new(
-        left.r - right,
-        left.g - right,
-        left.b - right,
-        left.a - right,
-    )
+    Color4::new(left.r - right, left.g - right, left.b - right, left.a - right)
 });
 
 impl_op_ex!(-|left: &Real, right: &Color4| -> Color4 {
-    Color4::new(
-        left - right.r,
-        left - right.g,
-        left - right.b,
-        left - right.a,
-    )
+    Color4::new(left - right.r, left - right.g, left - right.b, left - right.a)
 });
 
 impl_op_ex_commutative!(*|left: &Color4, right: &Real| -> Color4 {
-    Color4::new(
-        left.r * right,
-        left.g * right,
-        left.b * right,
-        left.a * right,
-    )
+    Color4::new(left.r * right, left.g * right, left.b * right, left.a * right)
 });
 
 impl_op_ex!(/|left: &Color4, right: &Real| -> Color4 {
@@ -268,3 +239,44 @@ impl_op_ex!(/=|left: &mut Color4, right: &Real| {
     left.b /= right;
     left.a /= right;
 });
+
+impl AbsDiffEq for Color4 {
+    type Epsilon = Real;
+
+    fn default_epsilon() -> Real {
+        Real::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: Real) -> bool {
+        Real::abs_diff_eq(&self.r, &other.r, epsilon)
+            && Real::abs_diff_eq(&self.g, &other.g, epsilon)
+            && Real::abs_diff_eq(&self.b, &other.b, epsilon)
+            && Real::abs_diff_eq(&self.a, &other.a, epsilon)
+    }
+}
+
+impl RelativeEq for Color4 {
+    fn default_max_relative() -> Real {
+        Real::default_max_relative()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Real, max_relative: Real) -> bool {
+        Real::relative_eq(&self.r, &other.r, epsilon, max_relative)
+            && Real::relative_eq(&self.g, &other.g, epsilon, max_relative)
+            && Real::relative_eq(&self.b, &other.b, epsilon, max_relative)
+            && Real::relative_eq(&self.a, &other.a, epsilon, max_relative)
+    }
+}
+
+impl UlpsEq for Color4 {
+    fn default_max_ulps() -> u32 {
+        Real::default_max_ulps()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Real, max_ulps: u32) -> bool {
+        Real::ulps_eq(&self.r, &other.r, epsilon, max_ulps)
+            && Real::ulps_eq(&self.g, &other.g, epsilon, max_ulps)
+            && Real::ulps_eq(&self.b, &other.b, epsilon, max_ulps)
+            && Real::ulps_eq(&self.a, &other.a, epsilon, max_ulps)
+    }
+}

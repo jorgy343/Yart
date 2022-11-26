@@ -7,6 +7,7 @@ edition = "2021"
 strip = true
 
 [dependencies]
+approx = "0.5"
 impl_ops = "0.1.1"
 yaml-rust = "0.4"
 image = "0.24"

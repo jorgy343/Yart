@@ -1,5 +1,6 @@
 use super::vector::Vector;
 use crate::common::*;
+use approx::{AbsDiffEq, RelativeEq, UlpsEq};
 use impl_ops::*;
 use std::ops::{self, Index, IndexMut};
 
@@ -199,3 +200,36 @@ impl_op_ex!(/=|left: &mut Vector2, right: &Real| {
     left.x /= right;
     left.y /= right;
 });
+
+impl AbsDiffEq for Vector2 {
+    type Epsilon = Real;
+
+    fn default_epsilon() -> Real {
+        Real::default_epsilon()
+    }
+
+    fn abs_diff_eq(&self, other: &Self, epsilon: Real) -> bool {
+        Real::abs_diff_eq(&self.x, &other.x, epsilon) && Real::abs_diff_eq(&self.y, &other.y, epsilon)
+    }
+}
+
+impl RelativeEq for Vector2 {
+    fn default_max_relative() -> Real {
+        Real::default_max_relative()
+    }
+
+    fn relative_eq(&self, other: &Self, epsilon: Real, max_relative: Real) -> bool {
+        Real::relative_eq(&self.x, &other.x, epsilon, max_relative)
+            && Real::relative_eq(&self.y, &other.y, epsilon, max_relative)
+    }
+}
+
+impl UlpsEq for Vector2 {
+    fn default_max_ulps() -> u32 {
+        Real::default_max_ulps()
+    }
+
+    fn ulps_eq(&self, other: &Self, epsilon: Real, max_ulps: u32) -> bool {
+        Real::ulps_eq(&self.x, &other.x, epsilon, max_ulps) && Real::ulps_eq(&self.y, &other.y, epsilon, max_ulps)
+    }
+}
