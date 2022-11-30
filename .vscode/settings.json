@@ -14,5 +14,6 @@
     "editor.rulers": [
         120
     ],
-    "editor.inlayHints.fontSize": 12
+    "editor.inlayHints.fontSize": 12,
+    "debug.allowBreakpointsEverywhere": true
 }

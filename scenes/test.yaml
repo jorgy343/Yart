@@ -81,7 +81,7 @@ geometry:
           normal: [1, 0, 0]
           point: [-20, 0, 0]
 
-      - sphere:
-          material: White
-          position: [0, 0, 10]
-          radius: 1
+    #   - sphere:
+    #       material: White
+    #       position: [0, 0, 10]
+    #       radius: 1

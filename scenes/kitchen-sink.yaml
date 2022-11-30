@@ -1,5 +1,5 @@
 config:
-  iterations: 1
+  iterations: 2
   colorClamp: [0, 1]
 
 camera:
@@ -9,7 +9,7 @@ camera:
     up: [0, 1, 0]
     fov: 45
     screenSize: [1920, 1080]
-    subpixelCount: 2
+    subpixelCount: 4
 
   #orthographic:
   #  position: [0, 0, -39]
@@ -41,7 +41,7 @@ missShader:
 materials:
   - emissive:
       name: White Light
-      emissiveColor: [5]
+      emissiveColor: [0.8]
   - emissive:
       name: Soft White Light
       emissiveColor: [0.01]
@@ -196,23 +196,23 @@ geometry:
     #           radius: 1
 
       - plane:
-          material: Blue
+          material: Green
           normal: [0, 0, 1]
           point: [0, 0, -40]
       - plane:
-          material: Red
+          material: Blue
           normal: [0, -1, 0]
           point: [0, 20, 0]
       - plane:
-          material: Blue
+          material: Orange
           normal: [0, 1, 0]
           point: [0, -20, 0]
       - plane:
-          material: Blue
+          material: Pink
           normal: [-1, 0, 0]
           point: [20, 0, 0]
       - plane:
-          material: Blue
+          material: Yellow
           normal: [1, 0, 0]
           point: [-20, 0, 0]
 

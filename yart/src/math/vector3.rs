@@ -12,14 +12,66 @@ pub struct Vector3 {
 }
 
 impl Vector3 {
+    /// Constructs a new vector with a value for each component.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let result = Vector3::new(2.0, 3.0, 4.0);
+    ///
+    /// assert_eq!(2.0, result.x);
+    /// assert_eq!(3.0, result.y);
+    /// assert_eq!(4.0, result.z);
+    /// ```
     pub fn new(x: Real, y: Real, z: Real) -> Self {
         Self { x, y, z }
     }
 
+    /// Constructs a new vector using the provided [`Vector2`] for the x and y coordintes and a second parameter for the
+    /// z axis.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector2::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let vector2 = Vector2::new(2.0, 3.0);
+    /// let result = Vector3::from_vector2(&vector2, 4.0);
+    ///
+    /// assert_eq!(2.0, result.x);
+    /// assert_eq!(3.0, result.y);
+    /// assert_eq!(4.0, result.z);
+    /// ```
     pub fn from_vector2(vector2: &Vector2, z: Real) -> Self {
         Self::new(vector2.x, vector2.y, z)
     }
 
+    /// Constructs a new vector using the provided [`Color3`]. The components are assigned as follows: `r -> x`, `g ->
+    /// y`, `b -> z`.
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::color3::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let color3 = Color3::new(0.2, 0.3, 0.4);
+    /// let result = Vector3::from_color3(&color3);
+    ///
+    /// assert_eq!(0.2, result.x);
+    /// assert_eq!(0.3, result.y);
+    /// assert_eq!(0.4, result.z);
+    /// ```
     pub fn from_color3(color3: &Color3) -> Self {
         Self::new(color3.r, color3.g, color3.b)
     }
@@ -42,14 +94,15 @@ impl Vector3 {
     /// ```
     /// # use approx::*;
     /// # use yart::common::*;
+    /// # use yart::math::vector::*;
     /// # use yart::math::vector3::*;
     /// #
     /// let left = Vector3::new(2.0, 3.0, 4.0);
     /// let right = Vector3::new(5.0, 6.0, 7.0);
     ///
-    /// let cross_product = Vector3::cross(&left, &right);
+    /// let result = Vector3::cross(&left, &right);
     ///
-    /// relative_eq!(Vector3::new(-3.0, 6.0, -3.0), &cross_product, max_relative = EPSILON);
+    /// assert_relative_eq!(Vector3::new(-3.0, 6.0, -3.0), &result, max_relative = EPSILON);
     /// ```
     pub fn cross(left: &Self, right: &Self) -> Self {
         Self::new(
@@ -81,12 +134,15 @@ impl Vector3 {
     /// ```
     /// # use approx::*;
     /// # use yart::common::*;
+    /// # use yart::math::vector::*;
     /// # use yart::math::vector3::*;
     /// #
     /// let target = Vector3::new(-0.707, 0.707, 0.0);
     /// let normal = Vector3::new(0.0, 1.0, 0.0);
     ///
-    /// relative_eq!(Vector3::new(0.707, 0.707, 0.0), target.reflect(&normal), epsilon = EPSILON);
+    /// let result = target.reflect(&normal);
+    ///
+    /// assert_relative_eq!(Vector3::new(0.707, 0.707, 0.0), result, max_relative = EPSILON);
     /// ```
     pub fn reflect(&self, normal: &Self) -> Self {
         self - 2.0 * (self ^ normal) * normal
@@ -116,10 +172,40 @@ impl Vector3 {
 }
 
 impl Vector for Vector3 {
+    /// Creates a vector from a scalar value. All components of the vector are set to the scalar value.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let result = Vector3::from_value(2.0);
+    ///
+    /// assert_eq!(Vector3::new(2.0, 2.0, 2.0), result);
+    /// ```
     fn from_value(value: Real) -> Self {
         Self::new(value, value, value)
     }
 
+    /// Creates a new vector where each component is the absolute value of the corresponding component of the input
+    /// vector.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let vector = Vector3::new(-2.0, 3.0, -4.0);
+    /// let result = Vector3::abs(&vector);
+    ///
+    /// assert_eq!(Vector3::new(2.0, 3.0, 4.0), result);
+    /// ```
     fn abs(value: &Self) -> Self {
         Self::new(Real::abs(value.x), Real::abs(value.y), Real::abs(value.z))
     }
@@ -131,14 +217,67 @@ impl Vector for Vector3 {
         self
     }
 
+    /// Performs a component-wise multiplication of two vectors. That is the resulting vector is `(left.x * right.x,
+    /// left.y * right.y, left.z * right.z)`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let left = Vector3::new(2.0, 3.0, 4.0);
+    /// let right = Vector3::new(5.0, 6.0, 7.0);
+    ///
+    /// let result = Vector3::component_mul(&left, &right);
+    ///
+    /// assert_eq!(Vector3::new(10.0, 18.0, 28.0), result);
+    /// ```
     fn component_mul(left: &Self, right: &Self) -> Self {
         Self::new(left.x * right.x, left.y * right.y, left.z * right.z)
     }
 
+    /// Calculates the distance between two points.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let left = Vector3::new(2.0, 3.0, 4.0);
+    /// let right = Vector3::new(5.0, 6.0, 7.0);
+    ///
+    /// let result = Vector3::distance(&left, &right);
+    ///
+    /// assert_relative_eq!(5.196152, result, max_relative = EPSILON);
+    /// ```
     fn distance(left: &Self, right: &Self) -> Real {
         Real::sqrt(Self::distance_squared(left, right))
     }
 
+    /// Calculates the distance squared between two points. That is the distance between two points multiplied by
+    /// itself.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let left = Vector3::new(2.0, 3.0, 4.0);
+    /// let right = Vector3::new(5.0, 6.0, 7.0);
+    ///
+    /// let result = Vector3::distance_squared(&left, &right);
+    ///
+    /// assert_relative_eq!(27.0, result, max_relative = EPSILON);
+    /// ```
     fn distance_squared(left: &Self, right: &Self) -> Real {
         let x = left.x - right.x;
         let y = left.y - right.y;
@@ -147,6 +286,24 @@ impl Vector for Vector3 {
         x * x + y * y + z * z
     }
 
+    /// Calculates the dot product between two vectors. The dot product is
+    /// `left.x * right.x + left.y * right.y + left.z * right.z`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # use approx::*;
+    /// # use yart::common::*;
+    /// # use yart::math::vector::*;
+    /// # use yart::math::vector3::*;
+    /// #
+    /// let left = Vector3::new(2.0, 3.0, 4.0);
+    /// let right = Vector3::new(5.0, 6.0, 7.0);
+    ///
+    /// let result = Vector3::dot(&left, &right);
+    ///
+    /// assert_eq!(56.0, result);
+    /// ```
     fn dot(left: &Self, right: &Self) -> Real {
         left.x * right.x + left.y * right.y + left.z * right.z
     }

@@ -55,10 +55,6 @@ impl Intersectable for Parallelogram {
         let p = ray.direction() % self.edge2;
         let determinant = self.edge1 ^ p;
 
-        if determinant < 0.0 {
-            return None;
-        }
-
         let inverse_determinant = Real::recip(determinant);
 
         let t = ray.position() - self.position;

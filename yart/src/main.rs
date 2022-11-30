@@ -18,12 +18,12 @@ use std::{error::Error, path::Path};
 use yaml::parse::load_scene;
 
 fn main() -> Result<(), Box<dyn Error>> {
-    let scene = load_scene(Path::new("../../../scenes/test.yaml"))?;
-    println!("{:?}", scene.area_lights);
+    let scene = load_scene(Path::new("../../../scenes/kitchen-sink.yaml"))?;
+    //println!("{:?}", scene.area_lights);
 
     let pixels = render(&scene);
 
-    write_image_file(&pixels)?;
+    //write_image_file(&pixels)?;
     Ok(())
 }
 
