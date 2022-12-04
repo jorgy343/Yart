@@ -9,10 +9,12 @@ pub fn render(scene: &Scene) -> Vec<Color3> {
     let patches = create_patches(width, height, 8);
 
     let patch_results = patches
-        .iter()
+        .par_iter()
         .map(|patch| {
+            let scene2 = scene;
+
             let mut rng = rand::thread_rng();
-            render_patch(&mut rng, scene, patch)
+            render_patch(&mut rng, scene2, patch)
         })
         .collect::<Vec<_>>();
 

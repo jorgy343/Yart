@@ -11,7 +11,7 @@ use crate::{
 };
 use rand::{Rng, RngCore};
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub struct Parallelogram {
     position: Vector3,
     edge1: Vector3,

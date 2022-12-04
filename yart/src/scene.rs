@@ -9,16 +9,15 @@ use crate::{
     yaml::parse_config::Config,
 };
 use rand::RngCore;
-use std::rc::Rc;
 
 pub struct Scene {
     pub config: Config,
     pub camera: Box<dyn Camera>,
     pub materials: Vec<Box<dyn Material>>,
     pub lights: Vec<Box<dyn Light>>,
-    pub area_lights: Vec<Rc<dyn AreaLight>>,
+    pub area_lights: Vec<Box<dyn AreaLight>>,
     pub miss_shader: Box<dyn MissShader>,
-    pub root_geometry: Rc<dyn Intersectable>,
+    pub root_geometry: Box<dyn Intersectable>,
 }
 
 impl Scene {
@@ -27,9 +26,9 @@ impl Scene {
         camera: Box<dyn Camera>,
         materials: Vec<Box<dyn Material>>,
         lights: Vec<Box<dyn Light>>,
-        area_lights: Vec<Rc<dyn AreaLight>>,
+        area_lights: Vec<Box<dyn AreaLight>>,
         miss_shader: Box<dyn MissShader>,
-        root_geometry: Rc<dyn Intersectable>,
+        root_geometry: Box<dyn Intersectable>,
     ) -> Self {
         Self {
             config,

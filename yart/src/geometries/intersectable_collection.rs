@@ -2,15 +2,14 @@ use crate::geometries::{
     bound_by_box::BoundByBox, bounding_box::BoundingBox, intersectable::Intersectable, intersection::Intersection,
     ray::Ray,
 };
-use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct IntersectableCollection {
-    children: Vec<Rc<dyn Intersectable>>,
+    children: Vec<Box<dyn Intersectable>>,
 }
 
 impl IntersectableCollection {
-    pub fn new(children: Vec<Rc<dyn Intersectable>>) -> Self {
+    pub fn new(children: Vec<Box<dyn Intersectable>>) -> Self {
         Self { children }
     }
 }

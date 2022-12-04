@@ -8,11 +8,11 @@ use std::{cmp::Ordering, rc::Rc};
 #[derive(Debug)]
 pub struct BoundingBoxLeaf {
     bounding_box: BoundingBox,
-    child: Rc<dyn Intersectable>,
+    child: Box<dyn Intersectable>,
 }
 
 impl BoundingBoxLeaf {
-    pub fn new(bounding_box: BoundingBox, child: Rc<dyn Intersectable>) -> Self {
+    pub fn new(bounding_box: BoundingBox, child: Box<dyn Intersectable>) -> Self {
         Self { bounding_box, child }
     }
 }
@@ -35,8 +35,8 @@ impl BoundByBox for BoundingBoxLeaf {
 
 fn build_bounding_box_hierarchy_split_by_long_axis_internal(
     _current_depth: u16,
-    geometries: Vec<Rc<dyn Intersectable>>,
-) -> Rc<dyn Intersectable> {
+    geometries: Vec<Box<dyn Intersectable>>,
+) -> Box<dyn Intersectable> {
     const MAXIMUM_LEAFS: usize = 8;
 
     let complete_bounding_box = BoundingBox::from_geometries(geometries.iter().map(|x| x.as_ref()));
@@ -55,7 +55,7 @@ fn build_bounding_box_hierarchy_split_by_long_axis_internal(
     let geometries_per_level = usize::max(1, f64::ceil(geometries.len() as f64 / MAXIMUM_LEAFS as f64) as usize);
 
     let geometry_chunks = geometries
-        .iter()
+        .into_iter()
         .sorted_by(|a, b| {
             let a_center_point = a.calculate_bounding_box().calculate_center_point();
             let b_center_point = b.calculate_bounding_box().calculate_center_point();
@@ -66,25 +66,25 @@ fn build_bounding_box_hierarchy_split_by_long_axis_internal(
         })
         .chunks(geometries_per_level);
 
-    let mut leaves: Vec<Rc<dyn Intersectable>> = Vec::new();
+    let mut leaves: Vec<Box<dyn Intersectable>> = Vec::new();
 
     for geometry_chunk in &geometry_chunks {
-        let geometries = geometry_chunk.map(|x| x.clone()).collect_vec();
+        let chunk_geometries = geometry_chunk.collect_vec();
 
-        let leaf_bounding_box = BoundingBox::from_geometries(geometries.iter().map(|x| x.as_ref()));
-        let geometry = Rc::new(IntersectableCollection::new(geometries));
+        let leaf_bounding_box = BoundingBox::from_geometries(chunk_geometries.iter().map(|x| x.as_ref()));
+        let geometry = Box::new(IntersectableCollection::new(chunk_geometries));
 
         // TODO: Take into account preferred leaf width and current depth.
 
-        let leaf = Rc::new(BoundingBoxLeaf::new(leaf_bounding_box, geometry));
+        let leaf = Box::new(BoundingBoxLeaf::new(leaf_bounding_box, geometry));
         leaves.push(leaf);
     }
 
-    Rc::new(IntersectableCollection::new(leaves))
+    Box::new(IntersectableCollection::new(leaves))
 }
 
 pub fn build_bounding_box_hierarchy_split_by_long_axis(
-    geometries: Vec<Rc<dyn Intersectable>>,
-) -> Rc<dyn Intersectable> {
+    geometries: Vec<Box<dyn Intersectable>>,
+) -> Box<dyn Intersectable> {
     build_bounding_box_hierarchy_split_by_long_axis_internal(1, geometries)
 }

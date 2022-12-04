@@ -2,16 +2,15 @@ use crate::geometries::{
     bound_by_box::BoundByBox, bounding_box::BoundingBox, bounding_volume::BoundingVolume, intersectable::Intersectable,
     intersection::Intersection, ray::Ray,
 };
-use std::rc::Rc;
 
 #[derive(Debug)]
 pub struct BoundingGeometry {
-    bounding_volume: Rc<dyn BoundingVolume>,
-    child: Rc<dyn Intersectable>,
+    bounding_volume: Box<dyn BoundingVolume>,
+    child: Box<dyn Intersectable>,
 }
 
 impl BoundingGeometry {
-    pub fn new(bounding_volume: Rc<dyn BoundingVolume>, child: Rc<dyn Intersectable>) -> Self {
+    pub fn new(bounding_volume: Box<dyn BoundingVolume>, child: Box<dyn Intersectable>) -> Self {
         Self { bounding_volume, child }
     }
 }
